@@ -1,0 +1,30 @@
+# Data Handling
+pandas
+numpy
+scipy
+
+# Machine Learning and Deep Learning
+scikit-learn
+keras
+tensorflow
+torch
+fastai
+tslearn
+tsfresh
+librosa
+
+# Visualization
+matplotlib
+seaborn
+plotly
+
+# Utility
+jupyter
+notebook
+tqdm
+
+# Code Quality and Testing
+pytest
+
+# Configuration
+pyyaml
