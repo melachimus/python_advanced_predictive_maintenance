@@ -55,8 +55,7 @@ def create_amplitude_df(file_path: str, resampled_data: np.ndarray, sample_rate:
                 os.makedirs(save_dir)
             plot_name = f"{os.path.splitext(file_name)[0]}_channel_{channel}.png"
             plt.savefig(os.path.join(save_dir, plot_name))
-        
-        plt.close()
+            plt.close()
     
     return pd.concat(amplitude_list, ignore_index=True)
 
@@ -108,8 +107,7 @@ def create_magnitude_df(file_path: str, resampled_data: np.ndarray, sample_rate:
                 os.makedirs(save_dir)
             plot_name = f"{os.path.splitext(file_name)[0]}_channel_{channel}.png"
             plt.savefig(os.path.join(save_dir, plot_name))
-        
-        plt.close()
+            plt.close()
     
     return pd.concat(magnitude_list, ignore_index=True)
 
@@ -163,8 +161,7 @@ def create_spectrogram_df(file_path: str, resampled_data: np.ndarray, sample_rat
                 os.makedirs(save_dir)
             plot_name = f"{os.path.splitext(file_name)[0]}_channel_{channel}.png"
             plt.savefig(os.path.join(save_dir, plot_name))
-        
-        plt.close()
+            plt.close()
     
     return pd.concat(spectrogram_list, ignore_index=True)
 
@@ -197,24 +194,24 @@ def verarbeite_wav_dateien(verzeichnis: str, funktion: str, target_sample_rate: 
                 ordnername = os.path.basename(os.path.dirname(dateipfad))
                 label = 'abnormal' if 'abnormal' in ordnername.lower() else 'normal'
 
-                sample_rate, data = wavfile.read(dateipfad)
+                data, _ = librosa.load(dateipfad, sr=target_sample_rate)
                 
-                if data.shape[1] != 8:
-                    raise ValueError("Die WAV-Datei muss 8 Kanäle haben.")
+                # if data.shape[1] != 8:
+                #     raise ValueError("Die WAV-Datei muss 8 Kanäle haben.")
                 
                 # Resample data based on the chosen sample rate
-                resampled_data = np.array([librosa.resample(data[:, channel].astype(np.float32), orig_sr=sample_rate, target_sr=target_sample_rate) for channel in range(8)]).T
+                # resampled_data = np.array([librosa.resample(data[:, channel].astype(np.float32), orig_sr=sample_rate, target_sr=target_sample_rate) for channel in range(8)]).T
                 
                 if plots_dir:
                     save_dir = plots_dir + "_" + label 
                 else:
                     save_dir = plots_dir
                 if funktion == "amplitude":
-                    df = create_amplitude_df(dateipfad, resampled_data, target_sample_rate, channels, save_dir=save_dir)
+                    df = create_amplitude_df(dateipfad, data, target_sample_rate, channels, save_dir=save_dir)
                 elif funktion == "magnitude":
-                    df = create_magnitude_df(dateipfad, resampled_data, target_sample_rate, channels, save_dir=save_dir)
+                    df = create_magnitude_df(dateipfad, data, target_sample_rate, channels, save_dir=save_dir)
                 elif funktion == "spectrogram":
-                    df = create_spectrogram_df(dateipfad, resampled_data, target_sample_rate, channels, save_dir=save_dir)
+                    df = create_spectrogram_df(dateipfad, data, target_sample_rate, channels, save_dir=save_dir)
                 
                 df['Label'] = label
                 alle_dfs.append(df)
@@ -226,6 +223,6 @@ def verarbeite_wav_dateien(verzeichnis: str, funktion: str, target_sample_rate: 
 # amplituden_dfs.to_csv("amplituden_dfs.csv")
 # magnitude_dfs = verarbeite_wav_dateien(r"C:\Users\anohl\OneDrive\Dokumente\A_Uni_stuff\Albstadt\Semester 1\Python advanced\Prüfungsleitung\python_advanced_predictive_maintenance\raw_data", funktion="magnitude", target_sample_rate=1000, channels=[0])
 # magnitude_dfs.to_csv("magnituden_dfs.csv")
-# spectrogram_dfs = verarbeite_wav_dateien(r"C:\Users\anohl\OneDrive\Dokumente\A_Uni_stuff\Albstadt\Semester 1\Python advanced\Prüfungsleitung\python_advanced_predictive_maintenance\raw_data", funktion="spectrogram", target_sample_rate=1000, channels=[0], save_plots=True, plots_dir="spectrogram_pics")
-# spectrogram_dfs.to_csv("spectrogram_dfs.csv")
+spectrogram_dfs = verarbeite_wav_dateien(r"C:\Users\anohl\OneDrive\Dokumente\A_Uni_stuff\Albstadt\Semester 1\Python advanced\Prüfungsleitung\python_advanced_predictive_maintenance\raw_data", funktion="spectrogram", target_sample_rate=1000, channels=[0], save_plots=True, plots_dir="spectrogram_pics")
+spectrogram_dfs.to_csv("spectrogram_dfs.csv")
 
