@@ -196,12 +196,6 @@ def verarbeite_wav_dateien(verzeichnis: str, funktion: str, target_sample_rate: 
 
                 data, _ = librosa.load(dateipfad, sr=target_sample_rate)
                 
-                # if data.shape[1] != 8:
-                #     raise ValueError("Die WAV-Datei muss 8 Kanäle haben.")
-                
-                # Resample data based on the chosen sample rate
-                # resampled_data = np.array([librosa.resample(data[:, channel].astype(np.float32), orig_sr=sample_rate, target_sr=target_sample_rate) for channel in range(8)]).T
-                
                 if plots_dir:
                     save_dir = plots_dir + "_" + label 
                 else:
