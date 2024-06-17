@@ -171,7 +171,6 @@ def verarbeite_wav_dateien(verzeichnis: str, funktion: str, target_sample_rate: 
                 label = 'abnormal' if 'abnormal' in ordnername.lower() else 'normal'
 
                 data, _ = librosa.load(dateipfad, sr=target_sample_rate)
-
                 if plots_dir:
                     save_dir = plots_dir + "_" + label 
                 else:
