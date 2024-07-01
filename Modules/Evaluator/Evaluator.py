@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, roc_curve, auc
-import configparser
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix,auc
 from Modules.Learner.learner import learner
 import matplotlib.pyplot as plt
 from keras.models import Sequential, load_model
@@ -21,7 +20,7 @@ class Evaluator:
             # Den Pfad zum 'Datenset'-Ordner konstruieren
             self.features_folder_path = os.path.join(base_folder_path, 'CSV_Features')
 
-            # Den Pfad wo die modelle gespeichert werden
+            # Den Pfad wo die Modelle gespeichert werden
             self.model_folder_path = os.path.join(base_folder_path, "Model_Storage")
         def compare_models(self):
             """

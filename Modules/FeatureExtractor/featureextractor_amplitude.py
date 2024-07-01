@@ -95,7 +95,7 @@ class FeatureExtractor:
         print("Feature extraction completed and saved to", self.output_file)
 
 if __name__ == '__main__':
-    input_file = r''
+    input_file = r'C:\Users\CR\python_advanced_predictive_maintenance\CSV\amplituden_dfs.csv'
     chunk_size = 1000
 
     extractor = FeatureExtractor(input_file, chunk_size)
