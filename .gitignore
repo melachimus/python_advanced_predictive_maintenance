@@ -163,3 +163,8 @@ cython_debug/
 
 # raw data
 raw_data
+
+# verarbeitet Daten
+CSV
+Graphen
+Bilder_Daten
