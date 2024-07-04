@@ -107,5 +107,3 @@ if __name__ == "__main__":
     evaluator_instance.confusion_matrices()
     evaluator_instance.roc_curves()
 
-
-
