@@ -1,22 +1,24 @@
-import pandas as pd
 import os
+import pandas as pd
 from tsfresh import extract_features
 
 class FeatureExtractor:
-    def __init__(self, input_file, chunk_size=1000):
+    def __init__(self, input_file):
         self.input_file = input_file
-        self.chunk_size = chunk_size
-        self.output_file = None
+        self.create_output_file()  # Direkt beim Initialisieren die Ausgabedatei erstellen
         
-    def clean_data(self, chunk):
-        if 'amplitude' in chunk.columns:
-            amplitude_chunk = chunk[['amplitude']]
+    def clean_data(self, data):
+        if 'amplitude' in data.columns:
+            magnitude_data = data[['amplitude']]
         else:
-            amplitude_chunk = pd.DataFrame()
+            magnitude_data = pd.DataFrame()
         
-        amplitude_chunk = amplitude_chunk.fillna(amplitude_chunk.mean())
+        magnitude_data = magnitude_data.fillna(magnitude_data.mean())
         
-        return amplitude_chunk
+        # Füge eine Spalte 'id' hinzu, um die Zeilen zu nummerieren
+        magnitude_data['id'] = range(len(magnitude_data))
+        
+        return magnitude_data
 
     def create_output_file(self):
         # Define path to save CSV file
@@ -26,78 +28,96 @@ class FeatureExtractor:
         os.makedirs(csv_storage_path, exist_ok=True)
         self.output_file = os.path.join(csv_storage_path, 'extracted_features_amplitude.csv')
 
-        # Create an empty DataFrame with column labels and save it to CSV file
+        # Erstelle eine leere DataFrame mit den Spaltenbezeichnungen und speichere sie in die CSV-Datei
         initial_data = {
-            'Schritt': [],
+            'id': [],
+            'Label': [],
+            'file_name': [],
             'amplitude__mean': [],
             'amplitude__median': [],
-            'amplitude__variance': [],
-            'amplitude__standard_deviation': [],
             'amplitude__minimum': [],
-            'amplitude__maximum': [],
-            'Label': []
+            'amplitude__maximum': []
         }
         initial_df = pd.DataFrame(initial_data)
         initial_df.to_csv(self.output_file, index=False)
 
-        print(f"Empty CSV file created: {self.output_file}")
+        print(f"Leere CSV-Datei erstellt: {self.output_file}")
 
-    def process_chunks(self):
-        # Check if output file has been created already
-        if not self.output_file:
-            self.create_output_file()
+    def process_data(self):
+        # Lese die gesamten Eingabedaten ein
+        try:
+            data = pd.read_csv(self.input_file)
+        except Exception as e:
+            print(f"Fehler beim Lesen der Eingabedatei: {str(e)}")
+            return
 
-        # Process chunks of data and extract features
-        chunk_iter = pd.read_csv(self.input_file, chunksize=self.chunk_size)
-        chunk_id_start = 1000
+        if 'Label' not in data.columns:
+            print("Keine 'Label'-Spalte in den Eingabedaten gefunden.")
+            return
 
-        custom_fc_parameters = {
-            'mean': None,
-            'median': None,
-            'variance': None,
-            'standard_deviation': None,
-            'minimum': None,
-            'maximum': None
-        }
+        # Gruppiere nach 'file_name' und 'Label'
+        grouped_data = data.groupby(['file_name', 'Label'])
 
-        for i, chunk in enumerate(chunk_iter):
-            chunk['id'] = chunk_id_start + i * self.chunk_size
-            cleaned_chunk = self.clean_data(chunk)
-            cleaned_chunk['id'] = chunk['id']
+        current_id = 0  # Startwert für die id-Zuweisung
 
-            if 'Label' not in chunk.columns:
-                print(f"No 'Label' column found in chunk {i}, skipping.")
-                continue
+        for (file_name, label), group in grouped_data:
+            cleaned_data = self.clean_data(group)
 
-            if not cleaned_chunk.empty:
+            if not cleaned_data.empty:
+                custom_fc_parameters = {
+                    'mean': None,
+                    'median': None,
+                    'minimum': None,
+                    'maximum': None
+                }
+
                 try:
                     extracted_features = extract_features(
-                        cleaned_chunk,
-                        column_id='id',
+                        cleaned_data,
+                        column_id='id',  # Verwende 'id' als column_id für tsfresh
                         column_value='amplitude',
                         default_fc_parameters=custom_fc_parameters
                     )
 
-                    # Insert 'Schritt' and 'Label' columns
-                    extracted_features.insert(0, 'Schritt', chunk['id'].iloc[0])
-                    extracted_features['Label'] = chunk['Label'].iloc[0]
+                    # Aggregate die extrahierten Merkmale
+                    aggregated_features = extracted_features.mean().to_frame().T  # Mean über alle Spalten
 
-                    # Save extracted features and label to CSV file
-                    extracted_features.to_csv(self.output_file, index=False, mode='a', header=False)
+                    # Füge 'file_name' und 'Label' hinzu
+                    aggregated_features['file_name'] = file_name
+                    aggregated_features['Label'] = label
 
-                    print(f"Chunk {i}: Features extracted and saved to CSV file.")
+                    # Füge eine 'id' Spalte hinzu und durchnummeriere die Zeilen
+                    aggregated_features['id'] = current_id
+                    current_id += 1  # Inkrementiere die id für die nächste Gruppe
+
+                    # Reihenfolge der Spalten anpassen, um 'id' und 'Label' zuerst zu haben
+                    columns_ordered = ['id', 'Label', 'file_name', 'amplitude__mean', 'amplitude__median',
+                                       'amplitude__minimum',
+                                       'amplitude__maximum']
+                    aggregated_features = aggregated_features[columns_ordered]
+
+                    # Speichere die aggregierten Merkmale und das Label in die CSV-Datei
+                    aggregated_features.to_csv(self.output_file, mode='a', header=False, index=False)
+
+                    # Nachricht für jeden Gruppenabschluss ausgeben
+                    print(f"Verarbeitet file_name: {file_name}, Label: {label}")
 
                 except Exception as e:
-                    print(f"Error processing chunk {i}: {str(e)}")
-            else:
-                print(f"No 'amplitude' column found in chunk {i}, skipping.")
+                    print(f"Fehler beim Verarbeiten der Daten für file_name: {file_name}, Label: {label}: {str(e)}")
 
-        print("Feature extraction completed and saved to", self.output_file)
+            else:
+                print(f"In den Daten für file_name: {file_name}, Label: {label} wurde keine 'magnitude'-Spalte gefunden.")
+
+        print("Feature-Extraktion abgeschlossen und in", self.output_file, "gespeichert")
 
 if __name__ == '__main__':
     input_file = r'C:\Users\CR\python_advanced_predictive_maintenance\CSV\amplituden_dfs.csv'
-    chunk_size = 1000
 
-    extractor = FeatureExtractor(input_file, chunk_size)
-    extractor.process_chunks()
+    extractor = FeatureExtractor(input_file)
+    extractor.process_data()
+
+
+
+
+
 
