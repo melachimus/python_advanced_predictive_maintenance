@@ -182,7 +182,9 @@ class DataLoader:
                     ordnername = os.path.basename(os.path.dirname(dateipfad))
                     label = 'abnormal' if 'abnormal' in ordnername.lower() else 'normal'
 
-                    data, _ = librosa.load(dateipfad, sr=self.target_sample_rate)
+                    data, sr = librosa.load(dateipfad, sr=self.target_sample_rate)
+                    print(f"Geladene Datei: {dateipfad}, Abtastrate: {sr}")
+
                     if funktion == "amplitude":
                         df = self.create_amplitude_df(dateipfad, data, save_plots, label=label)
                     elif funktion == "magnitude":
@@ -196,24 +198,3 @@ class DataLoader:
         return pd.concat(alle_dfs, ignore_index=True)
 
 
-BASE_DIR = os.getcwd()
-DATA_PATH = os.path.join(BASE_DIR,"raw_data")
-dataloader = DataLoader(DATA_PATH, target_sample_rate=1000)
-
-# # Amplitude Daten verarbeiten und speichern
-# print("Verarbeite Amplitude Daten...")
-# amplituden_dfs = dataloader.verarbeite_wav_dateien(funktion="amplitude", save_plots=True)
-# amplituden_dfs.to_csv(os.path.join(dataloader.csv_folder_path, "amplituden_dfs.csv"))
-# print("Amplitude Daten gespeichert.")
-
-# # Magnitude Daten verarbeiten und speichern
-# print("Verarbeite Magnitude Daten...")
-# magnitude_dfs = dataloader.verarbeite_wav_dateien(funktion="magnitude", save_plots=True)
-# magnitude_dfs.to_csv(os.path.join(dataloader.csv_folder_path, "magnituden_dfs.csv"))
-# print("Magnitude Daten gespeichert.")
-
-# Spectrogram Daten verarbeiten und speichern
-print("Verarbeite Spectrogram Daten...")
-spectrogram_dfs = dataloader.verarbeite_wav_dateien(funktion="spectrogram", save_plots=True)
-spectrogram_dfs.to_csv(os.path.join(dataloader.csv_folder_path, "spectrogram_dfs.csv"))
-print("Spectrogram Daten gespeichert.")
