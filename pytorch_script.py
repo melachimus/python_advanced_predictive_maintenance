@@ -1,3 +1,12 @@
+"""
+Filename: pytorch.py
+Author:Anshel Nohl <nohalansh@hs-albsig.de>
+
+Created at: 2024-06-29
+Last changed: 2024-07-06
+"""
+
+
 import os
 import numpy as np
 import torch
@@ -10,7 +19,7 @@ import torch.optim as optim
 from typing import List, Tuple, Dict, Any
 
 class SpectrogramDataset(Dataset):
-    def __init__(self, file_list: List[str]) -> None:
+    def __init__(self, file_list: list[str]) -> None:
         """
         Initialisiert das Dataset mit einer Liste von Dateinamen.
         
@@ -94,7 +103,7 @@ class SpectrogramNet(nn.Module):
         return x
 
 class SpectrogramClassifier:
-    def __init__(self, train_files: List[str], test_files: List[str], input_dim: int, params: Dict[str, Any]) -> None:
+    def __init__(self, train_files: list[str], test_files: list[str], input_dim: int, params: dict[str: any]) -> None:
         """
         Initialisiert den Klassifikator mit den gegebenen Parametern.
         
@@ -246,9 +255,9 @@ def tune_hyperparameters(train_files: List[str], test_files: List[str], input_di
         print(f'Best model saved at {model_path} with F1 Score: {best_f1}')
 
 # Beispiel für die Nutzung des Frameworks
-if __name__ == "__main__":
-    BASE_DIR = os.getcwd()
-    data_directory = os.path.join(BASE_DIR, "Bilder_Daten")
+def run_tuning_pipeline(base_directory: str, param_grid: dict[str: any]) -> None:
+
+    data_directory = os.path.join(base_directory, "Bilder_Daten")
     file_list = [os.path.join(data_directory, f) for f in os.listdir(data_directory)]
 
     train_files, test_files = train_test_split(file_list, test_size=0.2, random_state=42)
