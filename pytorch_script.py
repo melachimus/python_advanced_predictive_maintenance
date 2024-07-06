@@ -254,9 +254,32 @@ def tune_hyperparameters(train_files: List[str], test_files: list[str], input_di
         print(f"Best model had the follwoing params: {best_params}")
         print(f'Best model saved at {model_path} with F1 Score: {best_f1}')
 
-# Beispiel für die Nutzung des Frameworks
 def run_tuning_pipeline(base_directory: str, param_grid: dict[str, int|str]) -> None:
+    """
+    Run a hyperparameter tuning pipeline for training a model on spectrogram datasets.
 
+    This function orchestrates the process of loading data, splitting it into training 
+    and testing sets, and then tuning the model's hyperparameters based on the provided
+    parameter grid.
+
+    Parameters:
+    base_directory (str): The base directory containing the "Bilder_Daten" subdirectory with the data files.
+    param_grid (dict[str, int|str]): A dictionary defining the grid of hyperparameters to be tuned. 
+                                     Keys represent hyperparameter names, and values are lists of possible values.
+
+    The parameter grid should include the following hyperparameters:
+    - 'hidden_dim1': List of integers for the first hidden layer dimensions.
+    - 'hidden_dim2': List of integers for the second hidden layer dimensions.
+    - 'hidden_dim3': List of integers for the third hidden layer dimensions.
+    - 'batch_size': List of integers for batch sizes.
+    - 'lr': List of floats for learning rates.
+    - 'optimizer': List of strings for optimizer types (e.g., 'adam', 'sgd', 'rmsprop').
+
+    Returns:
+    None
+
+    This function does not return any value but will print out the results of the hyperparameter tuning.
+    """
     data_directory = os.path.join(base_directory, "Bilder_Daten")
     file_list = [os.path.join(data_directory, f) for f in os.listdir(data_directory)]
 
