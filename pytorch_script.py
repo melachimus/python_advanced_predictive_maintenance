@@ -249,10 +249,19 @@ def tune_hyperparameters(train_files: List[str], test_files: list[str], input_di
             best_classifier = classifier
 
     if best_classifier is not None:
-        model_path = os.path.join(os.getcwd(), "Models", "best_model.pth")
+        model_directory = os.path.join(os.getcwd(), "Models")
+        os.makedirs(model_directory, exist_ok=True)
+        
+        model_path = os.path.join(model_directory, "best_model.pth")
         best_classifier.save_model(model_path)
-        print(f"Best model had the follwoing params: {best_params}")
+        
+        result_file_path = os.path.join(model_directory, "best_model_info.txt")
+        with open(result_file_path, "w") as file:
+            file.write(f"Best model had the following params: {best_params}\n")
+            file.write(f'Best model saved at {model_path} with F1 Score: {best_f1}\n')
+        
         print(f'Best model saved at {model_path} with F1 Score: {best_f1}')
+        print(f'Model details written to {result_file_path}')
 
 def run_tuning_pipeline(base_directory: str, param_grid: dict[str, int|str]) -> None:
     """
