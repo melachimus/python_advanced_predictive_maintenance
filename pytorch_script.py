@@ -1,3 +1,12 @@
+"""
+Filename: pytorch.py
+Author:Anshel Nohl <nohalansh@hs-albsig.de>
+
+Created at: 2024-06-29
+Last changed: 2024-07-06
+"""
+
+
 import os
 import numpy as np
 import torch
@@ -10,7 +19,7 @@ import torch.optim as optim
 from typing import List, Tuple, Dict, Any
 
 class SpectrogramDataset(Dataset):
-    def __init__(self, file_list: List[str]) -> None:
+    def __init__(self, file_list: list[str]) -> None:
         """
         Initialisiert das Dataset mit einer Liste von Dateinamen.
         
@@ -94,7 +103,7 @@ class SpectrogramNet(nn.Module):
         return x
 
 class SpectrogramClassifier:
-    def __init__(self, train_files: List[str], test_files: List[str], input_dim: int, params: Dict[str, Any]) -> None:
+    def __init__(self, train_files: list[str], test_files: list[str], input_dim: int, params: dict[str, int|str]) -> None:
         """
         Initialisiert den Klassifikator mit den gegebenen Parametern.
         
@@ -212,7 +221,7 @@ class SpectrogramClassifier:
         os.makedirs(os.path.dirname(model_path), exist_ok=True)
         torch.save(self.model.state_dict(), model_path)
 
-def tune_hyperparameters(train_files: List[str], test_files: List[str], input_dim: int, param_grid: List[Dict[str, Any]]) -> None:
+def tune_hyperparameters(train_files: List[str], test_files: list[str], input_dim: int, param_grid: list[dict[str, int|str]]) -> None:
     """
     Optimiert die Hyperparameter des Modells und speichert das beste Modell.
     
@@ -240,15 +249,47 @@ def tune_hyperparameters(train_files: List[str], test_files: List[str], input_di
             best_classifier = classifier
 
     if best_classifier is not None:
-        model_path = os.path.join(os.getcwd(), "Models", "best_model.pth")
+        model_directory = os.path.join(os.getcwd(), "Models")
+        os.makedirs(model_directory, exist_ok=True)
+        
+        model_path = os.path.join(model_directory, "best_model.pth")
         best_classifier.save_model(model_path)
-        print(f"Best model had the follwoing params: {best_params}")
+        
+        result_file_path = os.path.join(model_directory, "best_model_info.txt")
+        with open(result_file_path, "w") as file:
+            file.write(f"Best model had the following params: {best_params}\n")
+            file.write(f'Best model saved at {model_path} with F1 Score: {best_f1}\n')
+        
         print(f'Best model saved at {model_path} with F1 Score: {best_f1}')
+        print(f'Model details written to {result_file_path}')
 
-# Beispiel für die Nutzung des Frameworks
-if __name__ == "__main__":
-    BASE_DIR = os.getcwd()
-    data_directory = os.path.join(BASE_DIR, "Bilder_Daten")
+def run_tuning_pipeline(base_directory: str, param_grid: dict[str, int|str]) -> None:
+    """
+    Run a hyperparameter tuning pipeline for training a model on spectrogram datasets.
+
+    This function orchestrates the process of loading data, splitting it into training 
+    and testing sets, and then tuning the model's hyperparameters based on the provided
+    parameter grid.
+
+    Parameters:
+    base_directory (str): The base directory containing the "Bilder_Daten" subdirectory with the data files.
+    param_grid (dict[str, int|str]): A dictionary defining the grid of hyperparameters to be tuned. 
+                                     Keys represent hyperparameter names, and values are lists of possible values.
+
+    The parameter grid should include the following hyperparameters:
+    - 'hidden_dim1': List of integers for the first hidden layer dimensions.
+    - 'hidden_dim2': List of integers for the second hidden layer dimensions.
+    - 'hidden_dim3': List of integers for the third hidden layer dimensions.
+    - 'batch_size': List of integers for batch sizes.
+    - 'lr': List of floats for learning rates.
+    - 'optimizer': List of strings for optimizer types (e.g., 'adam', 'sgd', 'rmsprop').
+
+    Returns:
+    None
+
+    This function does not return any value but will print out the results of the hyperparameter tuning.
+    """
+    data_directory = os.path.join(base_directory, "Bilder_Daten")
     file_list = [os.path.join(data_directory, f) for f in os.listdir(data_directory)]
 
     train_files, test_files = train_test_split(file_list, test_size=0.2, random_state=42)
@@ -256,15 +297,6 @@ if __name__ == "__main__":
     sample_train_data, sample_train_label = train_dataset[0]
 
     input_dim = sample_train_data.numel()
-
-    param_grid = {
-        'hidden_dim1': [128, 256],
-        'hidden_dim2': [64, 128],
-        'hidden_dim3': [32, 64],
-        'batch_size': [32, 64],
-        'lr': [0.001, 0.005],
-        'optimizer': ['adam', 'sgd', 'rmsprop'],
-    }
 
     param_grid = list(ParameterGrid(param_grid))
     tune_hyperparameters(train_files, test_files, input_dim, param_grid)

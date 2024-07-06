@@ -1,3 +1,12 @@
+"""
+Filename: data_intake.py
+Author:Christina Maria Richard <richarch@hs-albsig.de>, Anshel Nohl <nohalansh@hs-albsig.de>
+
+Created at: 2024-06-24
+Last changed: 2024-07-06
+"""
+
+
 import os
 import numpy as np
 import pandas as pd
