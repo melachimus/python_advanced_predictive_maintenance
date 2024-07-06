@@ -103,7 +103,7 @@ class SpectrogramNet(nn.Module):
         return x
 
 class SpectrogramClassifier:
-    def __init__(self, train_files: list[str], test_files: list[str], input_dim: int, params: dict[str: any]) -> None:
+    def __init__(self, train_files: list[str], test_files: list[str], input_dim: int, params: dict[str, int|str]) -> None:
         """
         Initialisiert den Klassifikator mit den gegebenen Parametern.
         
@@ -221,7 +221,7 @@ class SpectrogramClassifier:
         os.makedirs(os.path.dirname(model_path), exist_ok=True)
         torch.save(self.model.state_dict(), model_path)
 
-def tune_hyperparameters(train_files: List[str], test_files: List[str], input_dim: int, param_grid: List[Dict[str, Any]]) -> None:
+def tune_hyperparameters(train_files: List[str], test_files: list[str], input_dim: int, param_grid: list[dict[str, int|str]]) -> None:
     """
     Optimiert die Hyperparameter des Modells und speichert das beste Modell.
     
@@ -255,7 +255,7 @@ def tune_hyperparameters(train_files: List[str], test_files: List[str], input_di
         print(f'Best model saved at {model_path} with F1 Score: {best_f1}')
 
 # Beispiel für die Nutzung des Frameworks
-def run_tuning_pipeline(base_directory: str, param_grid: dict[str: any]) -> None:
+def run_tuning_pipeline(base_directory: str, param_grid: dict[str, int|str]) -> None:
 
     data_directory = os.path.join(base_directory, "Bilder_Daten")
     file_list = [os.path.join(data_directory, f) for f in os.listdir(data_directory)]
@@ -265,15 +265,6 @@ def run_tuning_pipeline(base_directory: str, param_grid: dict[str: any]) -> None
     sample_train_data, sample_train_label = train_dataset[0]
 
     input_dim = sample_train_data.numel()
-
-    param_grid = {
-        'hidden_dim1': [128, 256],
-        'hidden_dim2': [64, 128],
-        'hidden_dim3': [32, 64],
-        'batch_size': [32, 64],
-        'lr': [0.001, 0.005],
-        'optimizer': ['adam', 'sgd', 'rmsprop'],
-    }
 
     param_grid = list(ParameterGrid(param_grid))
     tune_hyperparameters(train_files, test_files, input_dim, param_grid)
