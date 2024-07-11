@@ -7,6 +7,7 @@ import joblib
 import os
 from Modules.Learner.learner import Learner  # Ensure correct import path
 
+# ID:02 (ChatGPT)
 class Evaluator:
     def __init__(self, learner):
         self.learner = learner
@@ -88,10 +89,16 @@ class Evaluator:
         """
         Loads the models from the Model_Storage directory.
         """
-        model_ANN = load_model(f"{self.model_folder_path}/ANN_model.h5")
-        self.models['ANN'] = model_ANN
+        for file_name in os.listdir(self.model_folder_path):
+            model_path = os.path.join(self.model_folder_path, file_name)
+            if file_name.endswith('.h5'):
+                model = load_model(model_path)
+                self.models[file_name.split('.')[0]] = model
+            elif file_name.endswith('.pkl'):
+                model = joblib.load(model_path)
+                self.models[file_name.split('.')[0]] = model
+            else:
+                print(f"Unsupported file type: {file_name}")
 
-        model_DecisionTree = joblib.load(f"{self.model_folder_path}/Decision_Tree.pkl")
-        self.models['DecisionTree'] = model_DecisionTree
 
 
