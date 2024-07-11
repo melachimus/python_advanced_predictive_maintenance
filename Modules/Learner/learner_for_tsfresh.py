@@ -17,7 +17,7 @@ import joblib
 
 
 class Learner:
-    def __init__(self,csv_path):
+    def __init__(self):
         # Initialize attributes as None
         self.X_train = None
         self.X_test = None
@@ -33,16 +33,17 @@ class Learner:
         self.D_tree_accuracy = None
 
         # Load data with exception handling
-        # Load data with exception handling
         try:
             data = pd.read_csv(
-                csv_path)
+                r'C:\Users\CR\python_advanced_predictive_maintenance\CSV_Features\Merge_CSV.csv')
             print("Data loaded successfully")
         except pd.errors.ParserError as e:
             print(f"Error parsing CSV: {e}")
             return
 
-
+        # Drop 'file_name' column if it exists
+        if 'file_name' in data.columns:
+            data.drop(columns=['file_name'], inplace=True)
 
         # Determine current script directory
         current_script_path = os.path.dirname(os.path.abspath(__file__))
@@ -154,3 +155,7 @@ class Learner:
         self.build_model()
 
 
+# Example usage
+if __name__ == "__main__":
+    learner = Learner()
+    learner.run_learner()

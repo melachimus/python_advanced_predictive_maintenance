@@ -110,8 +110,4 @@ class FeatureExtractor:
 
         print("Feature-Extraktion abgeschlossen und in", self.output_file, "gespeichert")
 
-if __name__ == '__main__':
-    input_file = r'C:\Users\CR\python_advanced_predictive_maintenance\CSV\magnituden_dfs.csv'
 
-    extractor = FeatureExtractor(input_file)
-    extractor.process_data()

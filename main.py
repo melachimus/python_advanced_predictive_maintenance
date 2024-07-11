@@ -2,69 +2,58 @@ import os
 import pandas as pd
 
 from Modules.Dataloader.data_intake import DataLoader
-from Modules.FeatureExtractor.featureextractor_amplitude import FeatureExtractor
-from Modules.FeatureExtractor.featureextractor_magnitude import FeatureExtractor
-from Modules.FeatureExtractor.featureextractor_spectogram import FeatureExtractor
-from Modules.FeatureExtractor.merge_CSV import CSVMerger
+from Modules.FeatureExtractor.featureextractor_amplitude import FeatureExtractor as AmplitudeFeatureExtractor
+from Modules.FeatureExtractor.featureextractor_magnitude import FeatureExtractor as MagnitudeFeatureExtractor
+from Modules.FeatureExtractor.featureextractor_spectogram import FeatureExtractor as SpectrogramFeatureExtractor
+from Modules.FeatureExtractor.merge_csv2 import CSVMerger
 from Modules.Evaluator.Evaluator_common import Evaluator
 from Modules.Learner.learner import Learner
 
-
 def main():
-    # Definiere die Pfade
-    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    wav_directory = r"D:\0_dB_pump\pump\id_00\abnormal"
-    csv_folder_path = os.path.join(base_path, 'CSV')
-    
-    # 1. Verarbeite WAV-Dateien und speichere die Ergebnisse in CSV-Dateien
-    dataloader = DataLoader(wav_directory)
-    
+    # Step 1: Data Loading and Preprocessing
+    dataloader = DataLoader(r"D:\0_dB_pump\pump\id_00")
+
+    # Amplitude Data Processing and Saving
     print("Verarbeite Amplitude Daten...")
-    amplitude_df = dataloader.verarbeite_wav_dateien(funktion="amplitude", save_plots=True)
-    amplitude_csv_path = os.path.join(csv_folder_path, "amplituden_dfs.csv")
-    amplitude_df.to_csv(amplitude_csv_path, index=False)
-    print(f"Amplitude Daten gespeichert unter {amplitude_csv_path}")
+    amplituden_dfs = dataloader.verarbeite_wav_dateien(funktion="amplitude", save_plots=True)
+    amplituden_dfs.to_csv(os.path.join(dataloader.csv_folder_path, "amplituden_dfs.csv"))
+    print("Amplitude Daten gespeichert.")
 
-    print("Verarbeite Magnitude Daten...")
-    magnitude_df = dataloader.verarbeite_wav_dateien(funktion="magnitude", save_plots=True)
-    magnitude_csv_path = os.path.join(csv_folder_path, "magnituden_dfs.csv")
-    magnitude_df.to_csv(magnitude_csv_path, index=False)
-    print(f"Magnitude Daten gespeichert unter {magnitude_csv_path}")
-
-    print("Verarbeite Spectrogram Daten...")
-    spectrogram_df = dataloader.verarbeite_wav_dateien(funktion="spectrogram", save_plots=True)
-    spectrogram_csv_path = os.path.join(csv_folder_path, "spectrogram_dfs.csv")
-    spectrogram_df.to_csv(spectrogram_csv_path, index=False)
-    print(f"Spectrogram Daten gespeichert unter {spectrogram_csv_path}")
-
-    # 2. Extrahiere Merkmale aus den Amplitude CSV-Daten
-    print("Extrahiere Merkmale aus den Amplitude Daten...")
-    feature_extractor = FeatureExtractor(amplitude_csv_path)
-    feature_extractor.process_data()
-
-    # 3. Extrahiere Merkmale aus den Amplitude CSV-Daten
-    print("Extrahiere Merkmale aus den Magnituden Daten...")
-    feature_extractor = FeatureExtractor(magnitude_csv_path)
-    feature_extractor.process_data()
-
-    # 4. Extrahiere Merkmale aus den Amplitude CSV-Daten
-    print("Extrahiere Merkmale aus den Magnituden Daten...")
-    feature_extractor = FeatureExtractor(spectrogram_csv_path)
-    feature_extractor.process_data()
+    # Magnitude Data Processing and Saving
+    #print("Verarbeite Magnitude Daten...")
+    magnitude_dfs = dataloader.verarbeite_wav_dateien(funktion="magnitude", save_plots=True)
+    magnitude_dfs.to_csv(os.path.join(dataloader.csv_folder_path, "magnituden_dfs.csv"))
+    print("Magnitude Daten gespeichert.")
 
 
-    # 5. Füge die CSV-Dateien zusammen
-    print("Füge die CSV-Dateien zusammen...")
-    feature_csv_folder_path = os.path.join(base_path, 'CSV_Features')
-    amplitude_features_csv_path = os.path.join(feature_csv_folder_path, "extracted_features_amplitude.csv")
-    magnitude_features_csv_path = os.path.join(feature_csv_folder_path, "extracted_features_magnitude.csv")
-    spectrogram_features_csv_path = os.path.join(feature_csv_folder_path, "extracted_features_spectrogram.csv")
+    # Step 2: Feature Extraction
+    amplitude_input_file = os.path.join(dataloader.csv_folder_path, "amplituden_dfs.csv")
+    magnitude_input_file = os.path.join(dataloader.csv_folder_path, "magnituden_dfs.csv")
 
-    merger = CSVMerger(amplitude_features_csv_path, magnitude_features_csv_path, spectrogram_features_csv_path)
-    merger.save_merged_csv()
+    amplitude_extractor = AmplitudeFeatureExtractor(amplitude_input_file)
+    amplitude_extractor.process_data()
 
-    learner = Learner()
+    magnitude_extractor = MagnitudeFeatureExtractor(magnitude_input_file)
+    magnitude_extractor.process_data()
+
+    # Step 3: CSV Merging
+    amplitude_features_file = amplitude_extractor.output_file
+    magnitude_features_file = magnitude_extractor.output_file
+
+    csv_merger = CSVMerger(amplitude_features_file, magnitude_features_file)
+    csv_merger.save_merged_csv()
+
+    # Step 4: Model Training and Evaluation
+    merged_csv_path = csv_merger.output_file
+    learner = Learner(merged_csv_path)
     learner.run_learner()
 
-if __name__ == '__main__':
+    # Step 5: Model Evaluation
+    evaluator = Evaluator(learner)
+    evaluator.compare_models()
+    evaluator.confusion_matrices()
+    evaluator.roc_curves()
+    evaluator.load_our_models()
+
+if __name__ == "__main__":
     main()

@@ -94,16 +94,4 @@ class Evaluator:
         model_DecisionTree = joblib.load(f"{self.model_folder_path}/Decision_Tree.pkl")
         self.models['DecisionTree'] = model_DecisionTree
 
-if __name__ == "__main__":
-    # Instantiate the Learner class
-    learner_instance = Learner()
-    learner_instance.run_learner()  # This will train your models and set predictions
-
-    # Instantiate the Evaluator class with the Learner instance
-    evaluator_instance = Evaluator(learner_instance)
-
-    # Execute methods of the Evaluator class
-    evaluator_instance.compare_models()
-    evaluator_instance.confusion_matrices()
-    evaluator_instance.roc_curves()
 

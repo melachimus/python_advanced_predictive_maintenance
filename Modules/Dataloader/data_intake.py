@@ -6,7 +6,7 @@ import librosa
 import librosa.display
 
 class DataLoader:
-    def __init__(self, verzeichnis, target_sample_rate=16000):
+    def __init__(self, verzeichnis, target_sample_rate=1000):
         self.verzeichnis = verzeichnis
         self.target_sample_rate = target_sample_rate
 
@@ -26,7 +26,7 @@ class DataLoader:
         if not os.path.exists(self.csv_folder_path):
             os.makedirs(self.csv_folder_path)
 
-    def create_amplitude_df(self, file_path, resampled_data, sample_rate, label, save_plots):
+    def create_amplitude_df(self, file_path, resampled_data, sample_rate, save_plots, label):
         file_name = os.path.basename(file_path)
         resampled_data /= np.max(np.abs(resampled_data))
         duration = len(resampled_data) / sample_rate
@@ -38,22 +38,22 @@ class DataLoader:
         })
 
         if save_plots:
+            plot_folder_path = os.path.join(self.graph_folder_path, label, 'amplitude')
+            if not os.path.exists(plot_folder_path):
+                os.makedirs(plot_folder_path)
             plt.figure(figsize=(10, 4))
             plt.plot(time, resampled_data)
             plt.title(f'Temporal Amplitude Variation')
             plt.xlabel('Time [s]')
             plt.ylabel('Amplitude')
             plt.grid(True)
-            label_folder_path = os.path.join(self.graph_folder_path, label)
-            if not os.path.exists(label_folder_path):
-                os.makedirs(label_folder_path)
             plot_name = f"{os.path.splitext(file_name)[0]}_amplitude.png"
-            plt.savefig(os.path.join(label_folder_path, plot_name))
+            plt.savefig(os.path.join(plot_folder_path, plot_name))
             plt.close()
 
         return amplitude_df
 
-    def create_magnitude_df(self, file_path, resampled_data, sample_rate, label, save_plots):
+    def create_magnitude_df(self, file_path, resampled_data, sample_rate, save_plots, label):
         file_name = os.path.basename(file_path)
         resampled_data /= np.max(np.abs(resampled_data))
         freqs = np.fft.rfftfreq(len(resampled_data), 1/sample_rate)
@@ -65,22 +65,22 @@ class DataLoader:
         })
 
         if save_plots:
+            plot_folder_path = os.path.join(self.graph_folder_path, label, 'magnitude')
+            if not os.path.exists(plot_folder_path):
+                os.makedirs(plot_folder_path)
             plt.figure(figsize=(10, 4))
             plt.plot(freqs, magnitudes)
             plt.title(f'Magnitude Spectrum')
             plt.xlabel('Frequency [Hz]')
             plt.ylabel('Magnitude')
             plt.grid(True)
-            label_folder_path = os.path.join(self.graph_folder_path, label)
-            if not os.path.exists(label_folder_path):
-                os.makedirs(label_folder_path)
             plot_name = f"{os.path.splitext(file_name)[0]}_magnitude.png"
-            plt.savefig(os.path.join(label_folder_path, plot_name))
+            plt.savefig(os.path.join(plot_folder_path, plot_name))
             plt.close()
 
         return magnitude_df
 
-    def create_spectrogram_df(self, file_path, resampled_data, sample_rate, label, save_plots):
+    def create_spectrogram_df(self, file_path, resampled_data, sample_rate, save_plots, label):
         file_name = os.path.basename(file_path)
         resampled_data /= np.max(np.abs(resampled_data))
         D = librosa.amplitude_to_db(np.abs(librosa.stft(resampled_data)), ref=np.max)
@@ -93,6 +93,9 @@ class DataLoader:
         spectrogram_df = spectrogram_df[["file_name", "frequency", "time", "amplitude"]]
 
         if save_plots:
+            plot_folder_path = os.path.join(self.graph_folder_path, label, 'spectrogram')
+            if not os.path.exists(plot_folder_path):
+                os.makedirs(plot_folder_path)
             plt.figure(figsize=(10, 4))
             D_plot = spectrogram_df.pivot(index='frequency', columns='time', values='amplitude')
             img = librosa.display.specshow(D_plot.values, sr=sample_rate, x_axis='time', y_axis='log')
@@ -100,11 +103,8 @@ class DataLoader:
             plt.title(f'Spectrogram')
             plt.xlabel('Time [s]')
             plt.ylabel('Frequency [Hz]')
-            label_folder_path = os.path.join(self.graph_folder_path, label)
-            if not os.path.exists(label_folder_path):
-                os.makedirs(label_folder_path)
             plot_name = f"{os.path.splitext(file_name)[0]}_spectrogram.png"
-            plt.savefig(os.path.join(label_folder_path, plot_name))
+            plt.savefig(os.path.join(plot_folder_path, plot_name))
             plt.close()
 
         return spectrogram_df
@@ -125,35 +125,13 @@ class DataLoader:
 
                     data, _ = librosa.load(dateipfad, sr=self.target_sample_rate)
                     if funktion == "amplitude":
-                        df = self.create_amplitude_df(dateipfad, data, self.target_sample_rate, label, save_plots)
+                        df = self.create_amplitude_df(dateipfad, data, self.target_sample_rate, save_plots, label)
                     elif funktion == "magnitude":
-                        df = self.create_magnitude_df(dateipfad, data, self.target_sample_rate, label, save_plots)
+                        df = self.create_magnitude_df(dateipfad, data, self.target_sample_rate, save_plots, label)
                     elif funktion == "spectrogram":
-                        df = self.create_spectrogram_df(dateipfad, data, self.target_sample_rate, label, save_plots)
+                        df = self.create_spectrogram_df(dateipfad, data, self.target_sample_rate, save_plots, label)
 
                     df['Label'] = label
                     alle_dfs.append(df)
 
         return pd.concat(alle_dfs, ignore_index=True)
-
-# Beispielhafte Verwendung:
-dataloader = DataLoader(r"D:\0_dB_pump\pump\id_00")
-
-# Amplitude Daten verarbeiten und speichern
-print("Verarbeite Amplitude Daten...")
-amplituden_dfs = dataloader.verarbeite_wav_dateien(funktion="amplitude", save_plots=True)
-amplituden_dfs.to_csv(os.path.join(dataloader.csv_folder_path, "amplituden_dfs.csv"))
-print("Amplitude Daten gespeichert.")
-
-# Magnitude Daten verarbeiten und speichern
-print("Verarbeite Magnitude Daten...")
-magnitude_dfs = dataloader.verarbeite_wav_dateien(funktion="magnitude", save_plots=True)
-magnitude_dfs.to_csv(os.path.join(dataloader.csv_folder_path, "magnituden_dfs.csv"))
-print("Magnitude Daten gespeichert.")
-
-# Spectrogram Daten verarbeiten und speichern
-print("Verarbeite Spectrogram Daten...")
-spectrogram_dfs = dataloader.verarbeite_wav_dateien(funktion="spectrogram", save_plots=True)
-spectrogram_dfs.to_csv(os.path.join(dataloader.csv_folder_path, "spectrogram_dfs.csv"))
-print("Spectrogram Daten gespeichert.")
-
