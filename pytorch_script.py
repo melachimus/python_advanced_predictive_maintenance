@@ -3,9 +3,8 @@ Filename: pytorch.py
 Author:Anshel Nohl <nohalansh@hs-albsig.de>
 
 Created at: 2024-06-29
-Last changed: 2024-07-06
+Last changed: 2024-07-12
 """
-
 
 import os
 import numpy as np
@@ -19,7 +18,7 @@ import torch.optim as optim
 from typing import List, Tuple, Dict, Any
 
 class SpectrogramDataset(Dataset):
-    def __init__(self, file_list: list[str]) -> None:
+    def __init__(self, file_list: List[str]) -> None:
         """
         Initialisiert das Dataset mit einer Liste von Dateinamen.
         
@@ -103,7 +102,7 @@ class SpectrogramNet(nn.Module):
         return x
 
 class SpectrogramClassifier:
-    def __init__(self, train_files: list[str], test_files: list[str], input_dim: int, params: dict[str, int|str]) -> None:
+    def __init__(self, train_files: List[str], test_files: List[str], input_dim: int, params: Dict[str, Any]) -> None:
         """
         Initialisiert den Klassifikator mit den gegebenen Parametern.
         
@@ -183,12 +182,12 @@ class SpectrogramClassifier:
 
             print(f'Epoch [{epoch+1}/{self.num_epochs}], Loss: {round(loss.item(), 4)}')
 
-    def evaluate_model(self) -> float:
+    def evaluate_model(self) -> Tuple[float, float, np.ndarray]:
         """
         Bewertet das Modell basierend auf den Testdaten.
         
         Returns:
-            float: F1-Score des Modells auf den Testdaten.
+            Tuple[float, float, np.ndarray]: F1-Score, Accuracy und Confusion Matrix des Modells auf den Testdaten.
         """
         self.model.eval()
         all_labels = []
@@ -209,7 +208,7 @@ class SpectrogramClassifier:
         print(f'F1 Score on test set: {round(f1, 2)}')
         print(f'Confusion Matrix on test set:\n{cm}')
 
-        return f1
+        return f1, accuracy, cm
 
     def save_model(self, model_path: str) -> None:
         """
@@ -221,7 +220,7 @@ class SpectrogramClassifier:
         os.makedirs(os.path.dirname(model_path), exist_ok=True)
         torch.save(self.model.state_dict(), model_path)
 
-def tune_hyperparameters(train_files: List[str], test_files: list[str], input_dim: int, param_grid: list[dict[str, int|str]]) -> None:
+def tune_hyperparameters(train_files: List[str], test_files: List[str], input_dim: int, param_grid: List[Dict[str, Any]]) -> None:
     """
     Optimiert die Hyperparameter des Modells und speichert das beste Modell.
     
@@ -234,6 +233,8 @@ def tune_hyperparameters(train_files: List[str], test_files: list[str], input_di
     best_f1 = 0.0
     best_params = None
     best_classifier = None
+    best_accuracy = 0.0
+    best_cm = None
 
     for params in param_grid:
         print(f'Training with parameters: {params}')
@@ -241,10 +242,12 @@ def tune_hyperparameters(train_files: List[str], test_files: list[str], input_di
         classifier.preprocess_data()
         classifier.initialize_model()
         classifier.train_model()
-        f1 = classifier.evaluate_model()
+        f1, accuracy, cm = classifier.evaluate_model()
 
         if f1 > best_f1:
             best_f1 = f1
+            best_accuracy = accuracy
+            best_cm = cm
             best_params = params
             best_classifier = classifier
 
@@ -257,13 +260,16 @@ def tune_hyperparameters(train_files: List[str], test_files: list[str], input_di
         
         result_file_path = os.path.join(model_directory, "best_model_info.txt")
         with open(result_file_path, "w") as file:
-            file.write(f"Best model had the following params: {best_params}\n")
-            file.write(f'Best model saved at {model_path} with F1 Score: {best_f1}\n')
+            file.write(f"Best Pytorch model had the following params: {best_params}\n")
+            file.write(f'Best Pytorch model saved at {model_path}\n')
+            file.write(f"F1 Score Pytorch: {best_f1}\n")
+            file.write(f"Accuracy Pytorch: {best_accuracy}\n")
+            file.write(f"Confusion Matrix Pytorch:\n{best_cm}\n")
         
         print(f'Best model saved at {model_path} with F1 Score: {best_f1}')
         print(f'Model details written to {result_file_path}')
 
-def run_tuning_pipeline(base_directory: str, param_grid: dict[str, int|str]) -> None:
+def run_tuning_pipeline(base_directory: str, param_grid: Dict[str, List[Any]]) -> None:
     """
     Run a hyperparameter tuning pipeline for training a model on spectrogram datasets.
 
@@ -273,7 +279,7 @@ def run_tuning_pipeline(base_directory: str, param_grid: dict[str, int|str]) -> 
 
     Parameters:
     base_directory (str): The base directory containing the "Bilder_Daten" subdirectory with the data files.
-    param_grid (dict[str, int|str]): A dictionary defining the grid of hyperparameters to be tuned. 
+    param_grid (Dict[str, List[Any]]): A dictionary defining the grid of hyperparameters to be tuned. 
                                      Keys represent hyperparameter names, and values are lists of possible values.
 
     The parameter grid should include the following hyperparameters:
