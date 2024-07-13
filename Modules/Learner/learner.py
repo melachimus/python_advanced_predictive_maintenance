@@ -14,6 +14,7 @@ from keras.optimizers import Adam
 from imblearn.over_sampling import SMOTE
 from keras import callbacks
 import joblib
+import matplotlib.pyplot as plt
 
 
 class Learner:
@@ -197,7 +198,28 @@ class Learner:
         model.compile(optimizer=opt, loss='binary_crossentropy', metrics=['accuracy'])
 
         # Train the model
-        model.fit(self.X_train_resampled, self.y_train_resampled, batch_size=32, epochs=50, callbacks=[early_stopping])
+        history=model.fit(self.X_train_resampled, self.y_train_resampled, batch_size=32, epochs=50, callbacks=[early_stopping], validation_split =0.2)
+        history_df = pd.DataFrame(history.history)
+
+        plt.plot(history_df.loc[:, ['loss']], "#BDE2E2", label='Training loss')
+        plt.plot(history_df.loc[:, ['val_loss']],"#C2C4E2", label='Validation loss')
+        plt.title('Training and Validation loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend(loc="best")
+
+        plt.show()
+
+        history_df = pd.DataFrame(history.history)
+
+        plt.plot(history_df.loc[:, ['accuracy']], "#BDE2E2", label='Training accuracy')
+        plt.plot(history_df.loc[:, ['val_accuracy']], "#C2C4E2", label='Validation accuracy')
+
+        plt.title('Training and Validation accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend()
+        plt.show()
 
         # Save the trained model to a file
         model.save(f"{self.model_folder_path}/ANN_model.h5")
@@ -225,6 +247,7 @@ class Learner:
         self.predict_decision_tree = model.predict(self.X_test)
         self.D_tree_accuracy = accuracy_score(self.y_test, self.predict_decision_tree)
         print(f"Decision Tree Accuracy: {self.D_tree_accuracy}")
+        print(classification_report(self.y_test,self.predict_decision_tree))
 
     def run_learner(self):
         """
