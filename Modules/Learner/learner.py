@@ -236,7 +236,7 @@ class Learner:
         self.rebalancing_with_imblearn()
         self.standardize_features()
         self.hyperparameter_decison_tree()
-        self.run_DecisionTree()t()
+        self.run_DecisionTree()
         self.build_model()
 
 
