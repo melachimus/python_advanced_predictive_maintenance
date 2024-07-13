@@ -6,27 +6,58 @@ import librosa
 import librosa.display
 
 class DataLoader:
+    """
+    A class to load audio data, extract features (amplitude, magnitude spectrum, spectrogram),
+    and optionally save corresponding plots.
+
+    Attributes:
+        verzeichnis (str): Directory path containing audio files.
+        target_sample_rate (int): Target sample rate for audio processing.
+        graph_folder_path (str): Path to save graph plots.
+        csv_folder_path (str): Path to save CSV files.
+    """
+
     def __init__(self, verzeichnis, target_sample_rate=1000):
+        """
+        Initialize DataLoader with directory path and target sample rate.
+
+        Args:
+            verzeichnis (str): Directory path containing audio files.
+            target_sample_rate (int, optional): Target sample rate for audio processing. Default is 1000.
+        """
         self.verzeichnis = verzeichnis
         self.target_sample_rate = target_sample_rate
 
-        # Ermitteln des Verzeichnisses des aktuellen Skripts
+        # Determine script directory
         current_script_path = os.path.dirname(os.path.abspath(__file__))
 
-        # Zwei Ebenen über dem aktuellen Skript zum 'Gruppe7'-Ordner wechseln
+        # Navigate two levels up from script to 'Gruppe7' folder
         base_folder_path = os.path.join(current_script_path, '..', '..')
 
-        # Den Pfad zum Graphen-Ordner konstruieren
+        # Construct path to 'Graphen' folder
         self.graph_folder_path = os.path.join(base_folder_path, 'Graphen')
         if not os.path.exists(self.graph_folder_path):
             os.makedirs(self.graph_folder_path)
 
-        # Den Pfad zum CSV-Ordner konstruieren
+        # Construct path to 'CSV' folder
         self.csv_folder_path = os.path.join(base_folder_path, 'CSV')
         if not os.path.exists(self.csv_folder_path):
             os.makedirs(self.csv_folder_path)
 
     def create_amplitude_df(self, file_path, resampled_data, sample_rate, save_plots, label):
+        """
+        Create DataFrame with temporal amplitude information and optionally save amplitude plot.
+
+        Args:
+            file_path (str): Path of the audio file.
+            resampled_data (numpy.ndarray): Audio data after resampling.
+            sample_rate (int): Sample rate of the audio data.
+            save_plots (bool): Flag to save amplitude plot.
+            label (str): Category label ('normal' or 'abnormal').
+
+        Returns:
+            pandas.DataFrame: DataFrame containing temporal amplitude information.
+        """
         file_name = os.path.basename(file_path)
         resampled_data /= np.max(np.abs(resampled_data))
         duration = len(resampled_data) / sample_rate
@@ -54,6 +85,19 @@ class DataLoader:
         return amplitude_df
 
     def create_magnitude_df(self, file_path, resampled_data, sample_rate, save_plots, label):
+        """
+        Create DataFrame with magnitude spectrum information and optionally save magnitude spectrum plot.
+
+        Args:
+            file_path (str): Path of the audio file.
+            resampled_data (numpy.ndarray): Audio data after resampling.
+            sample_rate (int): Sample rate of the audio data.
+            save_plots (bool): Flag to save magnitude spectrum plot.
+            label (str): Category label ('normal' or 'abnormal').
+
+        Returns:
+            pandas.DataFrame: DataFrame containing magnitude spectrum information.
+        """
         file_name = os.path.basename(file_path)
         resampled_data /= np.max(np.abs(resampled_data))
         freqs = np.fft.rfftfreq(len(resampled_data), 1/sample_rate)
@@ -81,6 +125,19 @@ class DataLoader:
         return magnitude_df
 
     def create_spectrogram_df(self, file_path, resampled_data, sample_rate, save_plots, label):
+        """
+        Create DataFrame with spectrogram information and optionally save spectrogram plot.
+
+        Args:
+            file_path (str): Path of the audio file.
+            resampled_data (numpy.ndarray): Audio data after resampling.
+            sample_rate (int): Sample rate of the audio data.
+            save_plots (bool): Flag to save spectrogram plot.
+            label (str): Category label ('normal' or 'abnormal').
+
+        Returns:
+            pandas.DataFrame: DataFrame containing spectrogram information.
+        """
         file_name = os.path.basename(file_path)
         resampled_data /= np.max(np.abs(resampled_data))
         D = librosa.amplitude_to_db(np.abs(librosa.stft(resampled_data)), ref=np.max)
@@ -110,6 +167,16 @@ class DataLoader:
         return spectrogram_df
 
     def verarbeite_wav_dateien(self, funktion, save_plots=False):
+        """
+        Process all .wav files in the specified directory and create a combined DataFrame.
+
+        Args:
+            funktion (str): Type of function to apply ('amplitude', 'magnitude', 'spectrogram').
+            save_plots (bool, optional): Flag to save corresponding plots. Default is False.
+
+        Returns:
+            pandas.DataFrame: Combined DataFrame containing extracted features and labels.
+        """
         valide_funktionen = ["amplitude", "magnitude", "spectrogram"]
         if funktion not in valide_funktionen:
             raise ValueError(f"Ungültige Option '{funktion}'. Erlaubte Optionen sind: {', '.join(valide_funktionen)}")
@@ -135,3 +202,4 @@ class DataLoader:
                     alle_dfs.append(df)
 
         return pd.concat(alle_dfs, ignore_index=True)
+

@@ -136,5 +136,3 @@ if __name__ == "__main__":
     extractor = FeatureExtractor()
     extractor.extract_features_from_audio(audio_folder)
 
-
-
