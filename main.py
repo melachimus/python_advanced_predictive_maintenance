@@ -20,7 +20,7 @@ def main():
     print("Amplitude Daten gespeichert.")
 
     # Magnitude Data Processing and Saving
-    #print("Verarbeite Magnitude Daten...")
+    print("Verarbeite Magnitude Daten...")
     magnitude_dfs = dataloader.verarbeite_wav_dateien(funktion="magnitude", save_plots=True)
     magnitude_dfs.to_csv(os.path.join(dataloader.csv_folder_path, "magnituden_dfs.csv"))
     print("Magnitude Daten gespeichert.")
@@ -30,8 +30,8 @@ def main():
     amplitude_input_file = os.path.join(dataloader.csv_folder_path, "amplituden_dfs.csv")
     magnitude_input_file = os.path.join(dataloader.csv_folder_path, "magnituden_dfs.csv")
 
-    amplitude_extractor = AmplitudeFeatureExtractor(amplitude_input_file)
-    amplitude_extractor.process_data()
+    #amplitude_extractor = AmplitudeFeatureExtractor(amplitude_input_file)
+    #amplitude_extractor.process_data()
 
     magnitude_extractor = MagnitudeFeatureExtractor(magnitude_input_file)
     magnitude_extractor.process_data()
@@ -44,6 +44,7 @@ def main():
     csv_merger.save_merged_csv()
 
     # Step 4: Model Training and Evaluation
+    
     merged_csv_path = csv_merger.output_file
     learner = Learner(merged_csv_path)
     learner.run_learner()
