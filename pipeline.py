@@ -40,4 +40,4 @@ param_grid = {
     'optimizer': ['adam', 'sgd', 'rmsprop'],
 }
 
-pytorch_script.run_tuning_pipeline(base_directory=BASE_DIR ,param_grid=param_grid)
+pytorch_script.run_tuning_pipeline(base_directory=BASE_DIR, param_grid=param_grid)
