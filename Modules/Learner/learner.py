@@ -7,6 +7,8 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
 from imblearn.under_sampling import RandomUnderSampler
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
@@ -18,54 +20,8 @@ import matplotlib.pyplot as plt
 
 
 class Learner:
-    """
-    A class for loading data, preprocessing, rebalancing, and training classification models.
-
-    Attributes
-    ----------
-    X_train : pd.DataFrame or None
-        Training features.
-    X_test : pd.DataFrame or None
-        Test features.
-    y_train : np.array or None
-        Training target.
-    y_test : np.array or None
-        Test target.
-    class_weights : dict or None
-        Class weights for rebalancing.
-    X_train_resampled : pd.DataFrame or None
-        Resampled training features after balancing.
-    y_train_resampled : np.array or None
-        Resampled training target after balancing.
-    scaler : StandardScaler or None
-        Scaler object for standardizing features.
-    predict_ANN : np.array or None
-        Predictions from the trained neural network model.
-    ANN_accuracy : float or None
-        Accuracy score of the neural network model.
-    predict_decision_tree : np.array or None
-        Predictions from the trained decision tree model.
-    D_tree_accuracy : float or None
-        Accuracy score of the decision tree model.
-
-    Methods
-    -------
-    __init__(self, csv_path):
-        Initializes attributes and loads data from the given CSV file.
-    rebalancing_with_class_weights(self):
-        Computes class weights and assigns them to self.class_weights.
-    rebalancing_with_imblearn(self):
-        Performs undersampling on the majority class in the training data.
-    standardize_features(self):
-        Standardizes numeric features in the resampled training set and test set.
-    build_model(self):
-        Builds and trains a neural network model using Keras.
-    run_DecisionTree(self):
-        Trains a decision tree classifier and evaluates its performance on the test set.
-    run_learner(self):
-        Executes the learning pipeline by invoking rebalancing, feature standardization, and model training.
-    """
-
+    """A class for loading data, preprocessing, rebalancing, and training classification models."""
+    
     def __init__(self, csv_path):
         """
         Initializes the Learner with attributes set to None and loads data from the specified CSV file.
@@ -187,7 +143,7 @@ class Learner:
         model.add(Dense(units=600, kernel_initializer='uniform', activation='relu',
                         input_dim=self.X_train_resampled.shape[1]))
         model.add(Dense(units=500, kernel_initializer='uniform', activation='relu'))
-        model.add(Dense(units=400, kernel_initializer='uniform', activation='relu'))
+        model.add(Dense(units=300, kernel_initializer='uniform', activation='relu'))
         model.add(Dropout(0.25))
         model.add(Dense(units=200, kernel_initializer='uniform', activation='relu'))
         model.add(Dense(units=50, kernel_initializer='uniform', activation='relu'))
@@ -232,6 +188,25 @@ class Learner:
         self.ANN_accuracy = accuracy_score(self.y_test, predict)
         print(classification_report(self.y_test, predict))
 
+    def hyperparameter_decison_tree(self):
+        """
+        Performs hyperparameter tuning for a DecisionTreeClassifier using GridSearchCV.
+
+        This function finds the best hyperparameters that maximize accuracy on the training data 
+        using 5-fold cross-validation. The optimal parameters are stored in `self.d_tree`.
+        """
+        param_grid = {
+            'max_depth': [None, 5, 10, 15],
+            'min_samples_split': [2, 5, 10],
+            'min_samples_leaf': [1, 2, 4],
+            'max_features': ['log2', 'sqrt']
+        }
+
+        decision_tree = DecisionTreeClassifier()
+        grid_search = GridSearchCV(estimator=decision_tree, param_grid=param_grid, cv=5, scoring='accuracy',n_jobs=-1)
+        grid_search.fit(self.X_train_resampled, self.y_train_resampled)
+        self.d_tree = grid_search.best_params_
+
     def run_DecisionTree(self):
         """
         Trains a decision tree classifier on self.X_train_resampled and self.y_train_resampled.
@@ -249,6 +224,7 @@ class Learner:
         print(f"Decision Tree Accuracy: {self.D_tree_accuracy}")
         print(classification_report(self.y_test,self.predict_decision_tree))
 
+
     def run_learner(self):
         """
         Executes the learning pipeline by invoking rebalancing, feature standardization, and model training.
@@ -259,7 +235,8 @@ class Learner:
         self.rebalancing_with_class_weights()
         self.rebalancing_with_imblearn()
         self.standardize_features()
-        self.run_DecisionTree()
+        self.hyperparameter_decison_tree()
+        self.run_DecisionTree()t()
         self.build_model()
 
 
