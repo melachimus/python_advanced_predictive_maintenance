@@ -11,7 +11,7 @@ import data_intake
 
 BASE_DIR = os.getcwd()
 DATA_PATH = os.path.join(BASE_DIR,"raw_data")
-dataloader = data_intake.DataLoader(DATA_PATH, target_sample_rate=1000)
+dataloader = data_intake.DataLoader(DATA_PATH, target_sample_rate=16000)
 
 # Amplitude Daten verarbeiten und speichern
 print("Verarbeite Amplitude Daten...")
@@ -40,4 +40,4 @@ param_grid = {
     'optimizer': ['adam', 'sgd', 'rmsprop'],
 }
 
-pytorch_script.run_tuning_pipeline(base_directory=BASE_DIR ,param_grid=param_grid)
+#pytorch_script.run_tuning_pipeline(base_directory=BASE_DIR ,param_grid=param_grid)
