@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from tsfresh import extract_features
 
+# ID00 (ChatGpt)
 class FeatureExtractor:
     """
     A class used to extract features from input data and save the results to a CSV file.
