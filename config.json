@@ -1,0 +1,9 @@
+{
+    "param_grid_pytorch": {
+        "hidden_dim1": [128, 256],
+        "hidden_dim2": [64, 128],
+        "batch_size": [32, 64],
+        "lr": [0.001, 0.005],
+        "optimizer": ["adam", "sgd", "rmsprop"]
+    }
+}

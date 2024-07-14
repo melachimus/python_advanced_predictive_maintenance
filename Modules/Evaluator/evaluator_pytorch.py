@@ -3,7 +3,7 @@ Filename: evaluator_pytorch.py
 Author:Anshel Nohl <nohalansh@hs-albsig.de>
 
 Created at: 2024-06-29
-Last changed: 2024-07-12
+Last changed: 2024-07-14
 """
 
 import os
@@ -17,6 +17,7 @@ from typing import List, Tuple, Dict, Any
 from sklearn.model_selection import train_test_split, ParameterGrid
 from Modules.Learner.learner_pytorch import SpectrogramNet, SpectrogramDataset
 
+# ChatGPT (ID: 03), ChatGPT (ID: 04), ChatGPT (ID: 05)
 class SpectrogramClassifier:
     def __init__(self, train_files: List[str], test_files: List[str], input_dim: int, params: Dict[str, Any]) -> None:
         """
@@ -185,6 +186,7 @@ def tune_hyperparameters(base_directory: str, train_files: List[str], test_files
         print(f'Best model saved at {model_path} with F1 Score: {best_f1}')
         print(f'Model details written to {result_file_path}')
 
+# ChatGPT (ID: 06)
 def run_tuning_pipeline(base_directory: str, param_grid: Dict[str, List[Any]]) -> None:
     """
     Run a hyperparameter tuning pipeline for training a model on spectrogram datasets.
