@@ -77,6 +77,50 @@ class Learner:
         # Print the shape of the features
         print("Shape of X:", X.shape)
 
+    def rebalancing_with_class_weights(self):
+        """
+        Computes class weights for imbalanced classes in self.y_train and assigns them to self.class_weights.
+
+        The class weights are computed using sklearn's compute_class_weight function based on the class distribution
+        in self.y_train.
+        """
+        weights = compute_class_weight(class_weight='balanced', classes=np.unique(self.y_train), y=self.y_train)
+        class_weights = {class_index: weight for class_index, weight in enumerate(weights)}
+        self.class_weights = class_weights
+
+        # Print classes and their weights
+        print("Classes and their weights:")
+        for class_index, weight in class_weights.items():
+            print(f"Class {class_index}: Weight = {weight}")
+
+    def rebalancing_with_imblearn(self):
+        """
+        Performs undersampling on the majority class in self.X_train and self.y_train using RandomUnderSampler from imblearn.
+
+        The majority class is undersampled to balance the class distribution in the training data.
+        """
+        # Apply undersampling to balance the classes in the training data
+        undersample = RandomUnderSampler(sampling_strategy='majority')
+        self.X_train_resampled, self.y_train_resampled = undersample.fit_resample(self.X_train, self.y_train)
+
+        print(f"Num of class 0 in train set after undersampling: {np.count_nonzero(self.y_train_resampled == 0)}")
+        print(f"Num of class 1 in train set after undersampling: {np.count_nonzero(self.y_train_resampled == 1)}")
+
+    def standardize_features(self):
+        """
+        Standardizes numeric features in self.X_train_resampled and self.X_test using StandardScaler.
+
+        Only numeric columns are selected for standardization, and the scaler is fitted on self.X_train_resampled.
+        """
+        # Select only numeric columns for standardization
+        numeric_columns = self.X_train_resampled.select_dtypes(include=[np.number]).columns
+
+        # Use these numeric columns for fitting and transforming scaler
+        self.scaler = StandardScaler()
+        self.X_train_resampled[numeric_columns] = self.scaler.fit_transform(self.X_train_resampled[numeric_columns])
+        self.X_test[numeric_columns] = self.scaler.transform(self.X_test[numeric_columns])
+
+        print("First row of scaled training set:", self.X_train_resampled.iloc[0])
 
 
 
