@@ -3,7 +3,7 @@ Filename: learner_pytorch.py
 Author:Anshel Nohl <nohalansh@hs-albsig.de>
 
 Created at: 2024-06-29
-Last changed: 2024-07-12
+Last changed: 2024-07-14
 """
 
 import os
@@ -14,6 +14,7 @@ from sklearn.preprocessing import StandardScaler
 import torch.nn as nn
 from typing import List, Tuple
 
+# ChatGPT (ID: 03), ChatGPT (ID: 04), ChatGPT (ID: 05)
 class SpectrogramDataset(Dataset):
     def __init__(self, file_list: List[str]) -> None:
         """
