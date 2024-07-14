@@ -143,7 +143,7 @@ class Learner:
         model.add(Dense(units=600, kernel_initializer='uniform', activation='relu',
                         input_dim=self.X_train_resampled.shape[1]))
         model.add(Dense(units=500, kernel_initializer='uniform', activation='relu'))
-        model.add(Dense(units=300, kernel_initializer='uniform', activation='relu'))
+        model.add(Dense(units=400, kernel_initializer='uniform', activation='relu'))
         model.add(Dropout(0.25))
         model.add(Dense(units=200, kernel_initializer='uniform', activation='relu'))
         model.add(Dense(units=50, kernel_initializer='uniform', activation='relu'))
@@ -223,6 +223,25 @@ class Learner:
         self.D_tree_accuracy = accuracy_score(self.y_test, self.predict_decision_tree)
         print(f"Decision Tree Accuracy: {self.D_tree_accuracy}")
         print(classification_report(self.y_test,self.predict_decision_tree))
+        
+    def hyperparameter_random_forest(self):
+        param_grid = {"criterion": ["gini", "entropy"],
+                      "min_samples_leaf": [1, 5, 10, 25],
+                      "min_samples_split": [2, 4, 10, 12, 16],
+                      "n_estimators": [100, 400, 700]
+                      }
+        rf = RandomForestClassifier(n_estimators=100, max_features=1, oob_score=True, random_state=1, n_jobs=-1)
+        clf = GridSearchCV(estimator=rf, param_grid=param_grid, n_jobs=-1)
+        clf.fit(self.X_train_resampled, self.y_train_resampled)
+        self.random_forest = clf.best_params_
+
+    def run_randomforest(self):
+        model = RandomForestClassifier(**self.random_forest)
+        model.fit(self.X_train_resampled, self.y_train_resampled)
+        joblib.dump(model, f"{self.model_folder_path}/{'Random_Forest.pkl'}")
+        self.predict_randomforest = model.predict(self.X_test)
+        self.rf_accuracy = accuracy_score(self.y_test, self.predict_randomforest)
+        print(classification_report(self.y_test,self.predict_randomforest))
 
 
     def run_learner(self):
@@ -230,14 +249,13 @@ class Learner:
         Executes the learning pipeline by invoking rebalancing, feature standardization, and model training.
 
         This method sequentially calls other methods to rebalance classes, standardize features, and train both a
-        neural network model and a decision tree classifier.
+        neural network model and a decision tree classifier
         """
         self.rebalancing_with_class_weights()
         self.rebalancing_with_imblearn()
         self.standardize_features()
         self.hyperparameter_decison_tree()
         self.run_DecisionTree()
+        self.hyperparameter_random_forest()
+        self.run_randomforest()
         self.build_model()
-
-
-

@@ -43,7 +43,10 @@ class Evaluator:
 
         # Sort models by accuracy in descending order
         sorted_models = sorted(model_accuracies.items(), key=lambda x: x[1], reverse=True)
-        results = pd.DataFrame(sorted_models, columns=["Model", "Score"])
+        results = pd.DataFrame(sorted_models, columns=["Model", "Accuracy"])
+        with open(os.path.join(self.model_folder_path, "best_accuracy_manual_extraction.txt"), "w") as file:
+            file.write(results.to_string(index=False))
+        
         print(results)
 
     def confusion_matrices(self):
@@ -97,6 +100,10 @@ class Evaluator:
             elif file_name.endswith('.pkl'):
                 model = joblib.load(model_path)
                 self.models[file_name.split('.')[0]] = model
+            elif file_name.endswith(".pth"):
+                print("wird über evaluator_pytorch.py erledigt")
+            elif file_name.endswith(".txt"):
+                pass
             else:
                 print(f"Unsupported file type: {file_name}")
 
