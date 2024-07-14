@@ -122,5 +122,138 @@ class Learner:
 
         print("First row of scaled training set:", self.X_train_resampled.iloc[0])
 
+    def build_model(self):
+        """
+        Builds and trains a neural network model using Keras Sequential API.
 
+        The model architecture consists of several dense layers with dropout for regularization. The model is compiled
+        with Adam optimizer and binary crossentropy loss. Training stops early if the loss does not improve after a
+        certain number of epochs.
+        """
+        # Define early stopping to prevent overfitting
+        early_stopping = callbacks.EarlyStopping(
+            monitor='loss',
+            min_delta=0.001,
+            patience=20,
+            restore_best_weights=True
+        )
 
+        # Build a neural network model using Keras Sequential API
+        model = Sequential()
+        model.add(Dense(units=600, kernel_initializer='uniform', activation='relu',
+                        input_dim=self.X_train_resampled.shape[1]))
+        model.add(Dense(units=500, kernel_initializer='uniform', activation='relu'))
+        model.add(Dense(units=400, kernel_initializer='uniform', activation='relu'))
+        model.add(Dropout(0.25))
+        model.add(Dense(units=200, kernel_initializer='uniform', activation='relu'))
+        model.add(Dense(units=50, kernel_initializer='uniform', activation='relu'))
+        model.add(Dropout(0.5))
+        model.add(Dense(units=1, kernel_initializer='uniform', activation='sigmoid'))
+
+        opt = Adam(learning_rate=0.01)
+        model.compile(optimizer=opt, loss='binary_crossentropy', metrics=['accuracy'])
+
+        # Train the model
+        history=model.fit(self.X_train_resampled, self.y_train_resampled, batch_size=32, epochs=50, callbacks=[early_stopping], validation_split =0.2)
+        history_df = pd.DataFrame(history.history)
+
+        plt.plot(history_df.loc[:, ['loss']], "#BDE2E2", label='Training loss')
+        plt.plot(history_df.loc[:, ['val_loss']],"#C2C4E2", label='Validation loss')
+        plt.title('Training and Validation loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend(loc="best")
+
+        plt.show()
+
+        history_df = pd.DataFrame(history.history)
+
+        plt.plot(history_df.loc[:, ['accuracy']], "#BDE2E2", label='Training accuracy')
+        plt.plot(history_df.loc[:, ['val_accuracy']], "#C2C4E2", label='Validation accuracy')
+
+        plt.title('Training and Validation accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend()
+        plt.show()
+
+        # Save the trained model to a file
+        model.save(f"{self.model_folder_path}/ANN_model.h5")
+        self.predict_ANN = model.predict(self.X_test)
+
+        # Convert probabilities to class labels (0 or 1) using a threshold of 0.5
+        predict = np.where(self.predict_ANN > 0.5, 1, 0)
+
+        # Compute accuracy score and print classification report
+        self.ANN_accuracy = accuracy_score(self.y_test, predict)
+        print(classification_report(self.y_test, predict))
+
+    def hyperparameter_decison_tree(self):
+        """
+        Performs hyperparameter tuning for a DecisionTreeClassifier using GridSearchCV.
+
+        This function finds the best hyperparameters that maximize accuracy on the training data 
+        using 5-fold cross-validation. The optimal parameters are stored in `self.d_tree`.
+        """
+        param_grid = {
+            'max_depth': [None, 5, 10, 15],
+            'min_samples_split': [2, 5, 10],
+            'min_samples_leaf': [1, 2, 4],
+            'max_features': ['log2', 'sqrt']
+        }
+
+        decision_tree = DecisionTreeClassifier()
+        grid_search = GridSearchCV(estimator=decision_tree, param_grid=param_grid, cv=5, scoring='accuracy',n_jobs=-1)
+        grid_search.fit(self.X_train_resampled, self.y_train_resampled)
+        self.d_tree = grid_search.best_params_
+
+    def run_DecisionTree(self):
+        """
+        Trains a decision tree classifier on self.X_train_resampled and self.y_train_resampled.
+
+        The trained model is saved to a file using joblib. Performance metrics such as accuracy are computed and printed.
+        """
+        # Train a decision tree classifier
+        model = DecisionTreeClassifier()
+        model.fit(self.X_train_resampled, self.y_train_resampled)
+        joblib.dump(model, f"{self.model_folder_path}/Decision_Tree.pkl")
+
+        # Perform predictions on the test set
+        self.predict_decision_tree = model.predict(self.X_test)
+        self.D_tree_accuracy = accuracy_score(self.y_test, self.predict_decision_tree)
+        print(f"Decision Tree Accuracy: {self.D_tree_accuracy}")
+        print(classification_report(self.y_test,self.predict_decision_tree))
+
+    def hyperparameter_random_forest(self):
+        param_grid = {"criterion": ["gini", "entropy"],
+                      "min_samples_leaf": [1, 5, 10, 25],
+                      "min_samples_split": [2, 4, 10, 12, 16],
+                      "n_estimators": [100, 400, 700]
+                      }
+        rf = RandomForestClassifier(n_estimators=100, max_features=1, oob_score=True, random_state=1, n_jobs=-1)
+        clf = GridSearchCV(estimator=rf, param_grid=param_grid, n_jobs=-1)
+        clf.fit(self.X_train_resampled, self.y_train_resampled)
+        self.random_forest = clf.best_params_
+
+    def run_randomforest(self):
+        model = RandomForestClassifier(**self.random_forest)
+        model.fit(self.X_train_resampled, self.y_train_resampled)
+        joblib.dump(model, f"{self.model_folder_path}/{'Random_Forest.pkl'}")
+        self.predict_randomforest = model.predict(self.x_test)
+        self.rf_accuracy = accuracy_score(self.y_test, self.predict_randomforest)
+
+    def run_learner(self):
+        """
+        Executes the learning pipeline by invoking rebalancing, feature standardization, and model training.
+
+        This method sequentially calls other methods to rebalance classes, standardize features, and train both a
+        neural network model and a decision tree classifier
+        """
+        self.rebalancing_with_class_weights()
+        self.rebalancing_with_imblearn()
+        self.standardize_features()
+        self.hyperparameter_decison_tree()
+        self.run_DecisionTree()
+        self.hyperparameter_random_forest
+        self.run_randomforest
+        self.build_model()
