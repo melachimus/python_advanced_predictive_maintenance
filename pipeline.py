@@ -25,6 +25,7 @@ pytorch_param_grid = config["param_grid_pytorch"]
 BASE_DIR = os.getcwd()
 DATA_PATH = os.path.join(BASE_DIR,"raw_data")
 FILE_NAME_PYTORCH = config["file_name_pytorch"]
+
 def main():
     dataloader = DataLoader(verzeichnis=DATA_PATH, target_sample_rate=1000)
 
