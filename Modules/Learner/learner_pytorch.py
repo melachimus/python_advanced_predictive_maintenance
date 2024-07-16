@@ -10,7 +10,7 @@ import os
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-from sklearn.preprocessing import StandardScalers
+from sklearn.preprocessing import StandardScaler
 import torch.nn as nn
 from typing import List, Tuple
 
