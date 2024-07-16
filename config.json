@@ -1,5 +1,6 @@
 {
     "param_grid_pytorch": {
+        "epochs": [20],
         "hidden_dim1": [128, 256],
         "hidden_dim2": [64, 128],
         "batch_size": [32, 64],
