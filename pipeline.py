@@ -77,7 +77,6 @@ def main():
     evaluator.load_our_models()
 
     # Model evaluation und training Pytorch
-
     run_tuning_pipeline(base_directory=BASE_DIR, param_grid=pytorch_param_grid, filename=FILE_NAME_PYTORCH)
 
 if __name__ == '__main__':

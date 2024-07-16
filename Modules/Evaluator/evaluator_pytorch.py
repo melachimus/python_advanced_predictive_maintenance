@@ -41,6 +41,7 @@ class SpectrogramClassifier:
         self.lr = params.get('lr', 0.001)
         self.optimizer_name = params.get('optimizer', 'adam')
         self.loss_function_name = params.get('loss_function', 'cross_entropy')
+        self.dropout_percentage = params.get("dropout_percentage", 0.5)
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = None
@@ -64,8 +65,9 @@ class SpectrogramClassifier:
         hidden_dim1 = self.params.get('hidden_dim1', 128)
         hidden_dim2 = self.params.get('hidden_dim2', 64)
         hidden_dim3 = self.params.get('hidden_dim3', 32)
+        droput_percentage = self.params.get("dropout_percentage", 0.5)
         
-        self.model = SpectrogramNet(self.input_dim, hidden_dim1, hidden_dim2, hidden_dim3).to(self.device)
+        self.model = SpectrogramNet(self.input_dim, hidden_dim1, hidden_dim2, hidden_dim3, droput_percentage).to(self.device)
 
     def get_optimizer(self) -> optim.Optimizer:
         """

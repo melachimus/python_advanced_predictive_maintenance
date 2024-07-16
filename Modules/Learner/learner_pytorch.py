@@ -54,7 +54,7 @@ class SpectrogramDataset(Dataset):
         return data_scaled, label
 
 class SpectrogramNet(nn.Module):
-    def __init__(self, input_dim: int, hidden_dim1: int = 128, hidden_dim2: int = 64, hidden_dim3: int = 32) -> None:
+    def __init__(self, input_dim: int, hidden_dim1: int = 128, hidden_dim2: int = 64, hidden_dim3: int = 32, dropout_percentage: float = 0.5) -> None:
         """
         Initialisiert das neuronale Netz mit den angegebenen Dimensionen.
         
@@ -66,11 +66,11 @@ class SpectrogramNet(nn.Module):
         """
         super(SpectrogramNet, self).__init__()
         self.fc1 = nn.Linear(input_dim, hidden_dim1)
-        self.dropout1 = nn.Dropout(0.25)
+        self.dropout1 = nn.Dropout(dropout_percentage)
         self.fc2 = nn.Linear(hidden_dim1, hidden_dim2)
-        self.dropout2 = nn.Dropout(0.25)
+        self.dropout2 = nn.Dropout(dropout_percentage)
         self.fc3 = nn.Linear(hidden_dim2, hidden_dim3)
-        self.dropout3 = nn.Dropout(0.25)
+        self.dropout3 = nn.Dropout(dropout_percentage)
         self.fc4 = nn.Linear(hidden_dim3, 2)
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
