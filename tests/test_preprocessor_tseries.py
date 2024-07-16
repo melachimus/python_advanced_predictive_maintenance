@@ -5,7 +5,7 @@ import pytest
 import pandas as pd
 from io import StringIO
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'modules')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Modules/Time_Series')))
 
 from preprocessor_tseries import read_config, read_time_series, transform_dataset
 
