@@ -1,0 +1,7 @@
+Best Pytorch model had the following params: {'batch_size': 64, 'dropout_percentage': 0.5, 'hidden_dim1': 128, 'hidden_dim2': 128, 'lr': 0.005, 'optimizer': 'rmsprop'}
+Best Pytorch model saved at C:\Users\anohl\OneDrive\Dokumente\A_Uni_stuff\Albstadt\Semester 1\Python advanced\Prüfungsleitung\python_advanced_predictive_maintenance\Model_Storage\Pytorch_model.pth
+F1 Score Pytorch: 0.9705882352941176
+Accuracy Pytorch: 0.991304347826087
+Confusion Matrix Pytorch:
+[[195   1]
+ [  1  33]]
