@@ -99,7 +99,7 @@ def transform_dataset(original_dataset: pd.DataFrame,
 if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    config_file = os.path.join(os.path.dirname(current_dir), 'config.json')
+    config_file = os.path.join(os.path.dirname(os.path.dirname(current_dir)), 'config.json')
     config = read_config(config_file)
 
     time_series_file = os.path.join(current_dir, config['amplitude_file'].replace('/', os.path.sep))
