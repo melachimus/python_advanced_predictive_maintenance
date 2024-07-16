@@ -2,12 +2,54 @@ import os
 import pandas as pd
 from tsfresh import extract_features
 
+#ID:00 (ChatGPT
 class FeatureExtractor:
+    """
+    A class used to extract features from input data and save the results to a CSV file.
+
+    Attributes
+    ----------
+    input_file : str
+        The path to the input CSV file.
+    output_file : str
+        The path where the output CSV file will be saved.
+
+    Methods
+    -------
+    clean_data(data):
+        Cleans the data by filling missing values and adding an 'id' column.
+    create_output_file():
+        Creates an empty CSV file to store extracted features.
+    process_data():
+        Processes the input data to extract features and saves them to the output file.
+    """
+
     def __init__(self, input_file):
+        """
+        Initializes the FeatureExtractor with the path to the input file.
+
+        Parameters
+        ----------
+        input_file : str
+            The path to the input CSV file.
+        """
         self.input_file = input_file
-        self.create_output_file()  # Direkt beim Initialisieren die Ausgabedatei erstellen
+        self.create_output_file()  
         
     def clean_data(self, data):
+        """
+        Cleans the input data by handling missing values and adding an 'id' column.
+
+        Parameters
+        ----------
+        data : pd.DataFrame
+            The input data to be cleaned.
+
+        Returns
+        -------
+        pd.DataFrame
+            The cleaned data with an 'id' column.
+        """
         if 'magnitude' in data.columns:
             magnitude_data = data[['magnitude']]
         else:
@@ -15,12 +57,15 @@ class FeatureExtractor:
         
         magnitude_data = magnitude_data.fillna(magnitude_data.mean())
         
-        # Füge eine Spalte 'id' hinzu, um die Zeilen zu nummerieren
+        # Adding id column to number the rows
         magnitude_data['id'] = range(len(magnitude_data))
         
         return magnitude_data
 
     def create_output_file(self):
+        """
+        Creates an empty CSV file to store extracted features and sets the output file path.
+        """
         # Define path to save CSV file
         current_script_path = os.path.dirname(os.path.abspath(__file__))
         base_path = os.path.abspath(os.path.join(current_script_path, '..', '..'))
@@ -28,7 +73,7 @@ class FeatureExtractor:
         os.makedirs(csv_storage_path, exist_ok=True)
         self.output_file = os.path.join(csv_storage_path, 'extracted_features_magnitude.csv')
 
-        # Erstelle eine leere DataFrame mit den Spaltenbezeichnungen und speichere sie in die CSV-Datei
+        # Create an empty DataFrame with column names and save it to the CSV file
         initial_data = {
             'id': [],
             'Label': [],
@@ -41,24 +86,27 @@ class FeatureExtractor:
         initial_df = pd.DataFrame(initial_data)
         initial_df.to_csv(self.output_file, index=False)
 
-        print(f"Leere CSV-Datei erstellt: {self.output_file}")
+        print(f"Empty CSV file created: {self.output_file}")
 
     def process_data(self):
-        # Lese die gesamten Eingabedaten ein
+        """
+        Processes the input data to extract features and saves them to the output file.
+        """
+        # Load the entire input data
         try:
             data = pd.read_csv(self.input_file)
         except Exception as e:
-            print(f"Fehler beim Lesen der Eingabedatei: {str(e)}")
+            print(f"Error reading input file: {str(e)}")
             return
 
         if 'Label' not in data.columns:
-            print("Keine 'Label'-Spalte in den Eingabedaten gefunden.")
+            print("No 'Label' column found in the input data.")
             return
 
-        # Gruppiere nach 'file_name' und 'Label'
+        # Group by 'file_name' and 'Label'
         grouped_data = data.groupby(['file_name', 'Label'])
 
-        current_id = 0  # Startwert für die id-Zuweisung
+        current_id = 0  # Starting value for the id assignment
 
         for (file_name, label), group in grouped_data:
             cleaned_data = self.clean_data(group)
@@ -74,40 +122,40 @@ class FeatureExtractor:
                 try:
                     extracted_features = extract_features(
                         cleaned_data,
-                        column_id='id',  # Verwende 'id' als column_id für tsfresh
+                        column_id='id',  
                         column_value='magnitude',
                         default_fc_parameters=custom_fc_parameters
                     )
 
-                    # Aggregate die extrahierten Merkmale
-                    aggregated_features = extracted_features.mean().to_frame().T  # Mean über alle Spalten
+                    # Aggregate the features by taking the mean over all columns
+                    aggregated_features = extracted_features.mean().to_frame().T 
 
-                    # Füge 'file_name' und 'Label' hinzu
+                    # Add additional columns for file_name and Label
                     aggregated_features['file_name'] = file_name
                     aggregated_features['Label'] = label
 
-                    # Füge eine 'id' Spalte hinzu und durchnummeriere die Zeilen
+                    # Add an 'id' column and number the rows
                     aggregated_features['id'] = current_id
-                    current_id += 1  # Inkrementiere die id für die nächste Gruppe
+                    current_id += 1  # Increment the id for the next group
 
-                    # Reihenfolge der Spalten anpassen, um 'id' und 'Label' zuerst zu haben
+                    # Reorder the columns in the desired order
                     columns_ordered = ['id', 'Label', 'file_name', 'magnitude__mean', 'magnitude__median',
-                                       'magnitude__minimum',
-                                       'magnitude__maximum']
+                                       'magnitude__minimum', 'magnitude__maximum']
                     aggregated_features = aggregated_features[columns_ordered]
 
-                    # Speichere die aggregierten Merkmale und das Label in die CSV-Datei
+                    # Append the aggregated features to the output file
                     aggregated_features.to_csv(self.output_file, mode='a', header=False, index=False)
 
-                    # Nachricht für jeden Gruppenabschluss ausgeben
-                    print(f"Verarbeitet file_name: {file_name}, Label: {label}")
+                    # Print the progress
+                    print(f"Processed file_name: {file_name}, Label: {label}")
 
                 except Exception as e:
-                    print(f"Fehler beim Verarbeiten der Daten für file_name: {file_name}, Label: {label}: {str(e)}")
+                    print(f"Error processing data for file_name: {file_name}, Label: {label}: {str(e)}")
 
             else:
-                print(f"In den Daten für file_name: {file_name}, Label: {label} wurde keine 'magnitude'-Spalte gefunden.")
+                print(f"No 'magnitude' column found in the data for file_name: {file_name}, Label: {label}.")
 
-        print("Feature-Extraktion abgeschlossen und in", self.output_file, "gespeichert")
+        print("Feature extraction completed and saved to", self.output_file)
+
 
 
