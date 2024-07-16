@@ -3,7 +3,7 @@ Filename: data_intake.py
 Author:Christina Maria Richard <richarch@hs-albsig.de>, Anshel Nohl <nohalansh@hs-albsig.de>
 
 Created at: 2024-06-24
-Last changed: 2024-07-14
+Last changed: 2024-07-16
 """
 
 
@@ -26,12 +26,10 @@ class DataLoader:
         - target_sample_rate (int): Zielabtastrate für die Audiodaten (Standard: 16000).
         """
         self.verzeichnis = verzeichnis
-        print(self.verzeichnis)
         self.target_sample_rate = target_sample_rate
 
         # Dafür sorgen, dass die neuen Daten auf der gleichen Heirarchie ebene abgelegt werden wie die Rohdaten
         base_folder_path = os.path.join(verzeichnis, '..' )
-        print(base_folder_path)
 
         self.picture_data = os.path.join(base_folder_path, 'Bilder_Daten')
         if not os.path.exists(self.picture_data):
@@ -45,7 +43,6 @@ class DataLoader:
 
         # Den Pfad zum CSV-Ordner konstruieren
         self.csv_folder_path = os.path.join(base_folder_path, 'CSV')
-        print(self.csv_folder_path)
         if not os.path.exists(self.csv_folder_path):
             os.makedirs(self.csv_folder_path)
 

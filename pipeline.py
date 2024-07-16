@@ -3,7 +3,7 @@ Filename: pipeline.py
 Author:Luca-David Stegmaier <stegmalu@hs-albsig.de>, Niklas Bukowski <bukowsni@hs-albsig.de>, Dominique Saile <sailedom@hs-albsig.de>, Christina Maria Richard <richarch@hs-albsig.de>, Anshel Nohl <nohalansh@hs-albsig.de>
 
 Created at: 2024-06-24
-Last changed: 2024-07-14
+Last changed: 2024-07-16
 """
 import os
 from Modules.Evaluator.evaluator_pytorch import run_tuning_pipeline
@@ -24,6 +24,7 @@ pytorch_param_grid = config["param_grid_pytorch"]
 
 BASE_DIR = os.getcwd()
 DATA_PATH = os.path.join(BASE_DIR,"raw_data")
+FILE_NAME_PYTORCH = config["file_name_pytorch"]
 def main():
     dataloader = DataLoader(verzeichnis=DATA_PATH, target_sample_rate=1000)
 
@@ -77,7 +78,7 @@ def main():
 
     # Model evaluation und training Pytorch
 
-    run_tuning_pipeline(base_directory=BASE_DIR, param_grid=pytorch_param_grid)
+    run_tuning_pipeline(base_directory=BASE_DIR, param_grid=pytorch_param_grid, filename=FILE_NAME_PYTORCH)
 
 if __name__ == '__main__':
     main()
