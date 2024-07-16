@@ -1,0 +1,4 @@
+        Model  Accuracy
+Random_Forest  0.913043
+Decision_Tree  0.904348
+    ANN_model  0.852174
