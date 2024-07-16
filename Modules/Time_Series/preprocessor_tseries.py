@@ -67,11 +67,11 @@ def transform_dataset(original_dataset: pd.DataFrame,
 
     Args:
         original_dataset (pd.DataFrame): Das ursprüngliche DataFrame, das transformiert werden soll.
-        sample (str, optional): Der Name der Spalte, die die Sample-Namen enthält. Standard ist 'sample'.
+        sample (str, optional): Der Name der Spalte, die die Sample-Namen enthält. Standard ist 'file_name'.
         feature (str, optional): Der Name der Spalte, die die Feature-Werte enthält. Standard ist 'feature'.
-        target (str, optional): Der Name der Spalte, die die Target-Werte enthält. Standard ist 'target'.
+        target (str, optional): Der Name der Spalte, die die Target-Werte enthält. Standard ist 'Label'.
         time (str, optional): Der Name der Spalte, die die Zeitwerte enthält. Standard ist 'time'.
-        value (str, optional): Der Name der Spalte, die die Amplitudenwerte enthält. Standard ist 'value'.
+        value (str, optional): Der Name der Spalte, die die Amplitudenwerte enthält. Standard ist 'amplitude'.
 
     Returns:
         pd.DataFrame: Das transformierte DataFrame.

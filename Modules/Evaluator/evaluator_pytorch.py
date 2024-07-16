@@ -36,8 +36,8 @@ class SpectrogramClassifier:
         self.input_dim = input_dim
         self.params = params
 
+        self.num_epochs = params.get("epochs", 20)
         self.batch_size = params.get('batch_size', 64)
-        self.num_epochs = 20
         self.lr = params.get('lr', 0.001)
         self.optimizer_name = params.get('optimizer', 'adam')
         self.loss_function_name = params.get('loss_function', 'cross_entropy')

@@ -104,6 +104,8 @@ class Evaluator:
                 print("wird über evaluator_pytorch.py erledigt")
             elif file_name.endswith(".txt"):
                 pass
+            elif file_name.endswith(".png"):
+                pass
             else:
                 print(f"Unsupported file type: {file_name}")
 
