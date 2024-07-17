@@ -11,8 +11,8 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from tsai.all import *
 from sklearn import metrics
-from preprocessor_tseries import transform_dataset, read_config, read_time_series
-from Rockets import DataHandler, RunManager
+from Modules.Time_Series.preprocessor_tseries import read_config, read_time_series, transform_dataset
+from Modules.Time_Series.Rockets import DataHandler, RunManager
 
 class InceptionTimeModel:
     def __init__(self, base_dir: str, config: dict):
