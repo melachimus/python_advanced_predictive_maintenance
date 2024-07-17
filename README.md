@@ -9,8 +9,8 @@ Dozent: Christian Seidler
 Institution: HS AlbSig
 
 # Teammitglieder und Codeverantwortung
--Dominique Saile (max.mustermann@example.com) - Datenlade-Modul
--Christina Maria Richard (erika.mustermann@example.com) - Datenvorverarbeitungs-Modul
+-Dominique Saile (sailedom@hs-albsig.de) - Manuelle Merkmalsextraktion (ANN, DecisionTree, RandomForest), Pipeline
+-Christina Maria Richard (richarch@hs-albsig.de) - Manuelle Merkmalsextraktion (ANN, Decision Tree, Random Forest), Pipeline
 -Anshel Nohl (nohlansh@hs-albsig.de) - Dataloader, Pipeline, Pytorch-learner, Pytorch-evaluator 
 -Niklas Bukowski (jane.smith@example.com) - Modellimplementierungs-Modul
 -Luca-David Stegmaier (alex.mueller@example.com) - Modelltraining und Evaluations-Modul
@@ -37,8 +37,10 @@ dropout_percentage: Dropout-Raten für die Regularisierung des Netzwerks.
 
 
 # Manuelle Merkmalsextraktion 
-Modelle: ANN, RandomForest, DecisionTree
-Ergebnisse: 
+Accuracy Score für folgende Modelle:
+ANN: 84,78%
+RandomForest: 90,87%
+DecisionTree: 93,48%
 
 # Zeitreihe als Input
 Modelle: [Liste der Modelle]
@@ -52,3 +54,8 @@ F1 Score: 97,03%
 Confusion Matrix:
 [[195   1]
  [  1  33]]
+
+# Lessons Learned
+Wir haben gelernt, dass es in so einem Projekt essenziell ist, von Anfang an eine klare Kommunikation innerhalb der Gruppe bezüglich der Ordnerstruktur und Herangehensweise sicherzustellen. 
+Ebenso wichtig ist es, sich auf einheitliche Benennungsrichtlinien zu einigen, damit alle Teammitglieder denselben Namenskonventionen folgen. Dies fördert eine effizientere Zusammenarbeit und verhindert Missverständnisse, Verwirrung oder Konflikte während der Entwicklung.
+Es ist ebenfalls entscheidend, die Teammitglieder über Änderungen bestehende oder zukünftige Änderungen im Code oder der Herangehensweise zu informieren um eine bessere Planung zu ermöglichen und Merge-Konflikte zu vermeiden.
