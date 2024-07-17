@@ -6,6 +6,16 @@
         "batch_size": [32, 64],
         "lr": [0.001, 0.005],
         "optimizer": ["adam", "sgd", "rmsprop"],
+        "dropout_percentage": [0.25, 0.5]
+    },
+    "param_grid_inceptiontime": {
+        "epochs": [10, 20],
+        "batch_size": [64, 128],
+        "lr": [0.001, 0.005]
+    },
+    "file_name_pytorch": "Pytorch",
+    "amplitude_file": "CSV/amplituden_dfs.csv"
+}
         "dropout_percentage":[0.25, 0.5]
     },
     "file_name_pytorch": "Pytorch",
