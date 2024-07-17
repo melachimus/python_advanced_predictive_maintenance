@@ -2,7 +2,9 @@
 Filename: Rockets.py
 Author: Niklas Bukowski <bukowsni@hs-albsig.de>
 
-Version: Relative Paths, Classes, Run Directory
+Rocket und MiniRocket zur Zeitreihenklassifikation.
+
+Klassen: Run Manager, DataHanlder, ModelHandler, Evaluation
 
 Created at: 2024-07-13
 Last changed: 2024-07-16
@@ -96,7 +98,8 @@ class DataHandler:
             print(f"An unexpected error occurred while loading the data: {e}")
             return None
 
-    def prep_data(self, df: pd.DataFrame, sample_col: str, feat_col: str, target_col: str, data_cols: list) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def prep_data(self, df: pd.DataFrame, sample_col: str, feat_col: str, target_col: str, 
+                  data_cols: list) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Bereitet die Daten für das Training und Testen vor.
 
@@ -349,50 +352,3 @@ class Evaluation:
             print(f"Error: Permission denied while trying to save the plot to {filepath}.")
         except Exception as e:
             print(f"An unexpected error occurred while saving the plot: {e}")
-
-if __name__ == "__main__":
-    
-    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    data_handler = DataHandler(base_dir)
-
-    still_testing = True
-    if still_testing == True:
-        
-        #Select Dataset
-        dataset = "MIMII"
-
-        if dataset == "OliveOil":
-            # UCR_data OliveOil:
-            X_train, y_train, X_test, y_test = get_UCR_data('OliveOil', Xdtype='float64')
-
-        elif dataset == "MIMII":
-            # Provide relative path for the data file
-            file_path = "CSV\\sample_data.csv"       #"CSV\\transformed_amplituden_dfs.csv"
-            df = data_handler.load_data(file_path)
-            X_train, y_train, X_test, y_test = data_handler.prep_data(df, sample_col='sample', feat_col='feature', target_col='target', data_cols=df.columns[2:-1])
-        
-        classifier_type = 'MiniRocket'
-
-    elif still_testing == False:
-        config_file = os.path.join(os.path.dirname(base_dir), 'config.json')
-        config = read_config(config_file)
-        time_series_file = os.path.join(base_dir, config['amplitude_file'].replace('/', os.path.sep))
-        time_series = read_time_series(time_series_file)
-        transformed_dataset = transform_dataset(time_series, sample='file_name', target='Label', value='amplitude')
-        X_train, y_train, X_test, y_test = data_handler.prep_data(transformed_dataset, sample_col='sample', feat_col='feature', target_col='target', data_cols=df.columns[2:-1])
-
-    run_manager = RunManager(base_dir, dataset, classifier_type)
-    model_handler = ModelHandler(classifier_type, 42, run_manager)
-
-    model_file_name = None      #Choose None for training a new Model or load one like this "MiniRocket_BA_0.55.pkl"
-    
-    # Rocket Classifier trainieren und vorhersage treffen
-    y_pred = model_handler.fit_predict(X_train, y_train, X_test, model_file_name )
-    
-    # Calculate and save metrics
-    eval = Evaluation(y_test, y_pred, X_test, run_manager)
-
-    # Save Model
-    model_handler.save_model(eval.balanced_acc)
-
-    print("Main script execution finished.")
