@@ -1,0 +1,16 @@
+2407171307_MIMII_Pump_00_MiniRocket
+
+Balanced Accuracy: 0.7191379310344828
+F1-Score: 0.910221447434282
+Precision: 0.917816865961991
+Recall: 0.9213973799126638
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.87      0.45      0.59        29
+           1       0.93      0.99      0.96       200
+
+    accuracy                           0.92       229
+   macro avg       0.90      0.72      0.77       229
+weighted avg       0.92      0.92      0.91       229

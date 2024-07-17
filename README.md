@@ -54,7 +54,8 @@ Ergebnisse:
 Accuracy: 98,70%
 F1 Score: 99,24%
 Confusion Matrix:
-[[ 31   3]
+
+[[ 31   3]​
  [  0 196]]
 
 # Lessons Learned

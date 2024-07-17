@@ -1,0 +1,6 @@
+Accuracy: 0.9869
+Precision: 0.9869
+Balanced Accuracy: 0.9655
+F1 Score: 0.9869
+Confusion Matrix:
+[('abnormal', 'normal', 4)]

@@ -12,10 +12,14 @@ import json
 from Modules.Dataloader.data_intake import DataLoader
 from Modules.FeatureExtractor.featureextractor_amplitude import FeatureExtractor as AmplitudeFeatureExtractor
 from Modules.FeatureExtractor.featureextractor_magnitude import FeatureExtractor as MagnitudeFeatureExtractor
-# # from Modules.FeatureExtractor.featureextractor_spectogram import FeatureExtractor as SpectrogramFeatureExtractor
+# from Modules.FeatureExtractor.featureextractor_spectogram import FeatureExtractor as SpectrogramFeatureExtractor
 from Modules.FeatureExtractor.merge_csv2 import CSVMerger
 from Modules.Evaluator.Evaluator_common import Evaluator
 from Modules.Learner.learner import Learner
+from Modules.Time_Series.Rockets import RunManager, DataHandler, ModelHandler, Evaluation
+from Modules.Time_Series import preprocessor_tseries as prep_ts'
+from Modules.Time_Series.inception_time import InceptionTimeModel
+from Modules.Time_Series.preprocessor_tseries import read_config
 
 with open("config.json", "r") as file:
     config = json.load(file)
@@ -79,6 +83,52 @@ def main():
 
     # Model evaluation und training Pytorch
     run_tuning_pipeline(base_directory=BASE_DIR, param_grid=pytorch_param_grid, filename=FILE_NAME_PYTORCH)
+
+
+    # Zeitreihenbasierte Klassifikation mit Minirocket
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    config_file = os.path.join(base_dir, 'config.json')
+    config = prep_ts.read_config(config_file)
+
+    data_handler = DataHandler(base_dir)
+
+    time_series_file = os.path.join(os.path.join(base_dir, 'Modules', 'Time_Series'), config['amplitude_file'].replace('/', os.path.sep))
+    time_series = prep_ts.read_time_series(time_series_file)
+    transformed_dataset = prep_ts.transform_dataset(time_series, sample='file_name', target='Label', value='amplitude')
+    X_train, y_train, X_test, y_test = data_handler.prep_data(transformed_dataset, sample_col='sample', feat_col='feature',
+                                                                                target_col='target', data_cols=df.columns[2:-1])
+
+    # Modell auswählen
+    classifier_type = "MiniRocket"  # "MiniRocket" oder "Rocket"
+    
+    # Datensatz Namen einbringen
+    dataset_name = "MIMII_Pump_00"
+
+    run_manager = RunManager(base_dir, dataset_name, classifier_type)
+    model_handler = ModelHandler(classifier_type, 42, run_manager)
+
+    # Modell zum Laden auswählen
+    model_file_name = "MiniRocket_BA_0.72_2407171307.pkl"      # "None" oder Dateiname, z.B. "MiniRocket_BA_0.72_2407171307.pkl"
+
+    # Rocket-Model trainieren und Vorhersage treffen
+    y_pred = model_handler.fit_predict(X_train, y_train, X_test, model_file_name )
+
+    # Evaluation berechnen und speichern
+    eval = Evaluation(y_test, y_pred, X_test, run_manager)
+
+    # Model Speichern
+    model_handler.save_model(eval.balanced_acc)
+
+    # Inception Time
+
+    config_file = os.path.join(base_dir, 'config.json')
+    config_file = os.path.abspath(config_file)
+    
+    config = read_config(config_file)
+    csv_path = config['amplitude_file'].replace('/', os.path.sep)
+    model = InceptionTimeModel(base_dir, config)
+    model.run(csv_path)
+
 
 if __name__ == '__main__':
     main()
