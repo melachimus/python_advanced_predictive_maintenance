@@ -3,6 +3,7 @@
         "epochs": [20],
         "hidden_dim1": [128, 256],
         "hidden_dim2": [64, 128],
+        "hidden_dim3": [64, 32],
         "batch_size": [32, 64],
         "lr": [0.001, 0.005],
         "optimizer": ["adam", "sgd", "rmsprop"],
