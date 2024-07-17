@@ -16,3 +16,8 @@
     "file_name_pytorch": "Pytorch",
     "amplitude_file": "CSV/amplituden_dfs.csv"
 }
+        "dropout_percentage":[0.25, 0.5]
+    },
+    "file_name_pytorch": "Pytorch",
+    "amplitude_file": "../../CSV/amplituden_dfs.csv"
+}
