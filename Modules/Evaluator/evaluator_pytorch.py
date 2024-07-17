@@ -122,7 +122,7 @@ class SpectrogramClassifier:
                 _, predicted = torch.max(outputs.data, 1)
                 all_labels.extend(batch_labels.cpu().numpy())
                 all_predictions.extend(predicted.cpu().numpy())
-                all_probs.extend(probs.cpu().numpy()[:, 1])  # probability of the positive class
+                all_probs.extend(probs.cpu().numpy()[:, 1])  
 
         accuracy = accuracy_score(all_labels, all_predictions)
         f1 = f1_score(all_labels, all_predictions)
@@ -249,6 +249,7 @@ def run_tuning_pipeline(base_directory: str, param_grid: Dict[str, List[Any]], f
     - 'batch_size': Liste der Ganzzahlen für Batch-Größen.
     - 'lr': Liste der Fließkommazahlen für Lernraten.
     - 'optimizer': Liste der Zeichenketten für Optimierertypen (z.B. 'adam', 'sgd', 'rmsprop').
+    - 'dropout_percentage': Liste von floats der dropout chances.
 
     Returns:
         None
