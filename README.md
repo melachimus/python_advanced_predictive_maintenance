@@ -46,6 +46,7 @@ DecisionTree: 93,48%
 Modelle ; Ergebnisse: 
 "Rocket_BA_0.74_2407171407.pkl" ; Balanced Accuracy: 73,6% - F1-Score: 91,6%
 "MiniRocket_BA_0.72_2407171307.pkl" ; Balanced Accuracy: 71,9% - F1-Score: 91%
+"InceptionTime.pkl" ; Balanced Accuracy: 96,55% - F1-Score: 98,69% - Precision: 98,69%
 
 # Spektrogramm als Input
 Modelle: Neuronales Netz
