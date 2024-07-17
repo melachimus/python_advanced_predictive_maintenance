@@ -2,6 +2,10 @@
 pandas
 numpy
 scipy
+os
+pickle
+datetime
+typing
 
 # Machine Learning and Deep Learning
 scikit-learn
@@ -12,6 +16,8 @@ fastai
 tslearn
 tsfresh
 librosa
+tsai
+sklearn
 
 # Visualization
 matplotlib
