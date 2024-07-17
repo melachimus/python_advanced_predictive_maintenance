@@ -253,7 +253,7 @@ def run_tuning_pipeline(base_directory: str, param_grid: Dict[str, List[Any]], f
     Returns:
         None
 
-    Diese Funktion gibt keinen Wert zurück, sondern druckt die Ergebnisse des Hyperparameter-Tunings aus.
+    Diese Funktion gibt keinen Wert zurück, sondern bereitet das hyperparamter-tuning vor.
     """
     data_directory = os.path.join(base_directory, "Bilder_Daten")
     file_list = [os.path.join(data_directory, f) for f in os.listdir(data_directory)]
