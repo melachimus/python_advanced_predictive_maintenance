@@ -12,8 +12,8 @@ Institution: HS AlbSig
 -Dominique Saile (sailedom@hs-albsig.de) - Manuelle Merkmalsextraktion (ANN, DecisionTree, RandomForest), Pipeline
 -Christina Maria Richard (richarch@hs-albsig.de) - Manuelle Merkmalsextraktion (ANN, Decision Tree, Random Forest), Pipeline
 -Anshel Nohl (nohlansh@hs-albsig.de) - Dataloader, Pipeline, Pytorch-learner, Pytorch-evaluator 
--Niklas Bukowski (jane.smith@example.com) - Modellimplementierungs-Modul
--Luca-David Stegmaier (alex.mueller@example.com) - Modelltraining und Evaluations-Modul
+-Niklas Bukowski (bukowsni@hs-albsig.de) - Zeitreihen, Rockets.py (Rocket & MiniRocket)
+-Luca-David Stegmaier (stegmalu@hs-albsig.de) - Zeitreihen, (Inception Time)
 
 # Beschreibung des Datensatzes
 Der verwendete Datensatz ist der "Sound Dataset for Malfunctioning Industrial Machine Investigation and Inspection" (MIMII), erstellt von Hitachi im Jahr 2019. Er enthält Aufnahmen von vier Maschinentypen: Ventile, Pumpen, Ventilatoren und Gleitschienen, sowohl im Normal- als auch im Anomaliebetrieb. Jede Aufnahme ist eine 10-sekündige Zeitreihe mit einer Abtastrate von 16 kHz, mit hinzugefügtem Fabriklärm bei verschiedenen Signal-Rausch-Verhältnissen (SNRs).
@@ -43,8 +43,10 @@ RandomForest: 90,87%
 DecisionTree: 93,48%
 
 # Zeitreihe als Input
-Modelle: [Liste der Modelle]
-Ergebnisse: [Zusammenfassung der Ergebnisse]
+Modelle ; Ergebnisse: 
+"Rocket_BA_0.74_2407171407.pkl" ; Balanced Accuracy: 73,6% - F1-Score: 91,6%
+"MiniRocket_BA_0.72_2407171307.pkl" ; Balanced Accuracy: 71,9% - F1-Score: 91%
+"InceptionTime.pkl" ; Balanced Accuracy: 96,55% - F1-Score: 98,69% - Precision: 98,69%
 
 # Spektrogramm als Input
 Modelle: Neuronales Netz
@@ -52,6 +54,7 @@ Ergebnisse:
 Accuracy: 98,70%
 F1 Score: 99,24%
 Confusion Matrix:
+
 [[ 31   3]​
  [  0 196]]
 
