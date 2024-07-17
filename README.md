@@ -49,11 +49,11 @@ Ergebnisse: [Zusammenfassung der Ergebnisse]
 # Spektrogramm als Input
 Modelle: Neuronales Netz
 Ergebnisse: 
-Accuracy: 99,13%
-F1 Score: 97,03%
+Accuracy: 98,70%
+F1 Score: 99,24%
 Confusion Matrix:
-[[195   1]
- [  1  33]]
+[[ 31   3]​
+ [  0 196]]
 
 # Lessons Learned
 Wir haben gelernt, dass es in so einem Projekt essenziell ist, von Anfang an eine klare Kommunikation innerhalb der Gruppe bezüglich der Ordnerstruktur und Herangehensweise sicherzustellen. 
