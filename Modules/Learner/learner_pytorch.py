@@ -45,7 +45,7 @@ class SpectrogramDataset(Dataset):
             Tuple[torch.Tensor, int]: Datenelement und zugehöriges Label.
         """
         file_name = self.file_list[idx]
-        label = 1 if 'abnormal' in file_name else 0  
+        label = 0 if 'abnormal' in file_name else 1  
         data = np.load(file_name)
         
         scaler = StandardScaler()
