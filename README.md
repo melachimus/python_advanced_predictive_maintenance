@@ -9,11 +9,11 @@ Dozent: Christian Seidler
 Institution: HS AlbSig
 
 # Teammitglieder und Codeverantwortung
-Dominique Saile (max.mustermann@example.com) - Datenlade-Modul
-Christina Maria Richard (erika.mustermann@example.com) - Datenvorverarbeitungs-Modul
-Anshel Nohl (john.doe@example.com) - Merkmalsextraktions-Modul
-Niklas Bukowski (jane.smith@example.com) - Modellimplementierungs-Modul
-Luca-David Stegmaier (alex.mueller@example.com) - Modelltraining und Evaluations-Modul
+-Dominique Saile (max.mustermann@example.com) - Datenlade-Modul
+-Christina Maria Richard (erika.mustermann@example.com) - Datenvorverarbeitungs-Modul
+-Anshel Nohl (nohlansh@hs-albsig.de) - Dataloader, Pipeline, Pytorch-learner, Pytorch-evaluator 
+-Niklas Bukowski (jane.smith@example.com) - Modellimplementierungs-Modul
+-Luca-David Stegmaier (alex.mueller@example.com) - Modelltraining und Evaluations-Modul
 
 # Beschreibung des Datensatzes
 Der verwendete Datensatz ist der "Sound Dataset for Malfunctioning Industrial Machine Investigation and Inspection" (MIMII), erstellt von Hitachi im Jahr 2019. Er enthält Aufnahmen von vier Maschinentypen: Ventile, Pumpen, Ventilatoren und Gleitschienen, sowohl im Normal- als auch im Anomaliebetrieb. Jede Aufnahme ist eine 10-sekündige Zeitreihe mit einer Abtastrate von 16 kHz, mit hinzugefügtem Fabriklärm bei verschiedenen Signal-Rausch-Verhältnissen (SNRs).
